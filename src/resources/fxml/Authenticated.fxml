@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="252.0" prefWidth="600.0"
+            style="-fx-background-color: #9e9e9e; -fx-border-color: #eeeeee; -fx-border-width: 2 px;"
+            xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ihm.controller.AuthenticatedController">
+    <children>
+        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="45.0" layoutY="41.0" pickOnBounds="true"
+                   preserveRatio="true" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="50.0">
+            <image>
+                <Image url="@../images/giphy.gif"/>
+            </image>
+        </ImageView>
+        <Text layoutX="300.0" layoutY="117.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Vous êtes authentifié(e)">
+            <font>
+                <Font name="Comic Sans MS" size="24.0"/>
+            </font>
+        </Text>
+    </children>
+</AnchorPane>
