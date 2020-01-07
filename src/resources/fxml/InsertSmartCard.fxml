@@ -9,34 +9,34 @@
             style="-fx-background-color: #9e9e9e; -fx-border-color: #eeeeee; -fx-border-width: 2px;"
             xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="ihm.controller.InsertSmartCardController">
-   <children>
-      <ImageView fitHeight="79.0" fitWidth="79.0" layoutX="110.0" layoutY="71.0" pickOnBounds="true"
-                 preserveRatio="true">
-         <image>
-            <Image url="@../images/case.png"/>
-         </image>
-      </ImageView>
-      <Text layoutX="38.0" layoutY="219.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Inserez votre carte">
-         <font>
-            <Font name="Comic Sans MS" size="24.0"/>
-         </font>
-      </Text>
-      <Button fx:id="closeButton" layoutX="242.0" mnemonicParsing="false" onAction="#closeHandler" prefHeight="33.0"
-              prefWidth="27.0" style="-fx-background-color: transparent;" AnchorPane.rightAnchor="5.0"
-              AnchorPane.topAnchor="5.0">
-         <graphic>
-            <ImageView fitHeight="35.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../images/cancel.png"/>
-               </image>
-            </ImageView>
-         </graphic>
-      </Button>
-      <Button fx:id="okButton" layoutX="98.0" layoutY="254.0" mnemonicParsing="false" onAction="#continueHandler"
-              text="Continuer">
-         <font>
-            <Font name="Comic Sans MS" size="18.0"/>
-         </font>
-      </Button>
-   </children>
+    <children>
+        <ImageView fitHeight="79.0" fitWidth="79.0" layoutX="110.0" layoutY="71.0" pickOnBounds="true"
+                   preserveRatio="true">
+            <image>
+                <Image url="@../images/case.png"/>
+            </image>
+        </ImageView>
+        <Text layoutX="38.0" layoutY="219.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Inserez votre carte">
+            <font>
+                <Font name="Comic Sans MS" size="24.0"/>
+            </font>
+        </Text>
+        <Button fx:id="closeButton" layoutX="242.0" mnemonicParsing="false" onAction="#closeHandler" prefHeight="33.0"
+                prefWidth="27.0" style="-fx-background-color: transparent;" AnchorPane.rightAnchor="5.0"
+                AnchorPane.topAnchor="5.0">
+            <graphic>
+                <ImageView fitHeight="35.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../images/cancel.png"/>
+                    </image>
+                </ImageView>
+            </graphic>
+        </Button>
+        <Button fx:id="okButton" layoutX="98.0" layoutY="254.0" mnemonicParsing="false" onAction="#continueHandler"
+                text="Continuer">
+            <font>
+                <Font name="Comic Sans MS" size="18.0"/>
+            </font>
+        </Button>
+    </children>
 </AnchorPane>

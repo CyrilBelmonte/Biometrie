@@ -1,5 +1,6 @@
 package ihm.controller;
 
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -10,10 +11,18 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import ihm.utils.Utils;
+import ihm.utils.filter.Canny;
+import ihm.utils.filter.Laplacien;
+import ihm.utils.filter.Prewitt;
+import ihm.utils.filter.Sobel;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,7 +30,6 @@ import javafx.stage.Stage;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
-import test.opencv.VideoCap;
 
 import javax.imageio.ImageIO;
 
@@ -31,6 +39,7 @@ public class BiometricVerificationController implements Initializable {
     private Stage stage;
 
     private Image image;
+    private Mat frameTmp;
     @FXML
     private ImageView cameraImage;
 
@@ -61,6 +70,7 @@ public class BiometricVerificationController implements Initializable {
                         Mat frame = grabFrame();
                         // convert and show the frame
                         Image imageToShow = Utils.mat2Image(frame);
+                        frameTmp = frame;
                         image = imageToShow;
                         updateImageView(cameraImage, imageToShow);
                     }
@@ -89,8 +99,36 @@ public class BiometricVerificationController implements Initializable {
     private Button button;
 
     @FXML
-    private void startCamera(ActionEvent event) {
+    private void startCamera(ActionEvent event) throws IOException, InterruptedException {
+
         saveToFile(image);
+
+        String filePath = "src\\resources\\tmp\\pictures.png";
+
+        Thread.sleep(2000);
+        Canny canny = new Canny();
+        canny.filtre(filePath);
+
+        Sobel sobel = new Sobel();
+        sobel.filtre(filePath);
+
+        Laplacien laplacien = new Laplacien();
+        laplacien.filtre(filePath);
+
+        Prewitt prewitt = new Prewitt();
+        prewitt.filtre(filePath);
+
+        Thread.sleep(2000);
+
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("/fxml/DiffTest.fxml"));
+
+        Parent parent = loader.load();
+
+        Scene scene = new Scene(parent, 600, 436);
+        Stage filter = new Stage();
+        filter.setScene(scene);
+        filter.show();
     }
 
 
