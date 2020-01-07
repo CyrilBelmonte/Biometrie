@@ -5,7 +5,7 @@ import org.opencv.core.Mat;
 
 public class HelloCV {
     // This is a comment
-    
+
     static {
         nu.pattern.OpenCV.loadShared();
     }
