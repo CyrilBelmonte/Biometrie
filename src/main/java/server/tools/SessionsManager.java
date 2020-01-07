@@ -8,13 +8,22 @@ import java.util.UUID;
 
 
 public class SessionsManager {
+    private static SessionsManager instance;
     private HashMap<String, Session> sessions;
-    SessionsValidityCheck sessionsValidityCheck;
+    private SessionsValidityCheck sessionsValidityCheck;
 
-    public SessionsManager() {
+    private SessionsManager() {
         sessions = new HashMap<>();
         sessionsValidityCheck = new SessionsValidityCheck();
         sessionsValidityCheck.start();
+    }
+
+    public static SessionsManager getInstance() {
+        if (instance == null) {
+            instance = new SessionsManager();
+        }
+
+        return instance;
     }
 
     public Session createSession(User user) {
