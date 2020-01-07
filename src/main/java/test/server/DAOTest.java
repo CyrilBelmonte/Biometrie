@@ -10,7 +10,7 @@ public class DAOTest {
         boolean hasSucceeded;
 
         User user1 = new User("John", "DOE", "john.doe@cergy.fr",
-                             1, 2, Tools.hmacMD5(Tools.hmacMD5("password", "2"), "1"));
+                              1, 2, Tools.hmacMD5(Tools.hmacMD5("password", "2"), "1"));
 
         hasSucceeded = DAOFactory.getUserDAO().insert(user1);
         System.out.println("Insertion of the user: " + hasSucceeded);

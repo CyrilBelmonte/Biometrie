@@ -20,11 +20,12 @@ public class ServerTest {
     // Supprimer clé / certificat
     // "C:\Program Files\Java\jdk1.8.0_211\bin\keytool.exe" -delete -alias client -keystore C:\client_keystore.jks
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         System.setProperty("javax.net.ssl.keyStore", "C:/server_keystore.jks");
         System.setProperty("javax.net.ssl.keyStorePassword", "password");
 
         Server server = new Server(4000);
-        server.listen();
+        server.listenBlock();
+        // server.shutdown();
     }
 }

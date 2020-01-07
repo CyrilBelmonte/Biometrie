@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.time.LocalDateTime;
 
 
 public class ClientHandler extends Thread {
@@ -16,6 +17,10 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
         try {
+            System.out.println("[" + LocalDateTime.now() + "] A new client is connected! "
+                               + clientSocket.getInetAddress().getHostAddress() + ":"
+                               + clientSocket.getPort());
+
             BufferedInputStream inputStream = new BufferedInputStream(clientSocket.getInputStream());
             BufferedOutputStream outputStream = new BufferedOutputStream(clientSocket.getOutputStream());
 
@@ -35,8 +40,8 @@ public class ClientHandler extends Thread {
             outputStream.close();
             clientSocket.close();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("[ERROR] ClientHandler exception: " + e.getMessage());
         }
     }
 }

@@ -1,38 +1,58 @@
 package server.engine;
 
-import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
-import java.io.IOException;
 import java.net.Socket;
+import java.time.LocalDateTime;
 
 
-public class Server {
+public class Server extends Thread {
     private int port;
+    private SSLServerSocket sslServerSocket;
+    private boolean isStopped;
 
     public Server(int port) {
         this.port = port;
+        this.isStopped = false;
     }
 
     public void listen() {
+        start();
+    }
+
+    public void listenBlock() {
+        listen();
+
         try {
-            ServerSocketFactory serverSocketFactory = SSLServerSocketFactory.getDefault();
-            SSLServerSocket sslServerSocket = (SSLServerSocket) serverSocketFactory.createServerSocket(port);
+            join();
 
-            System.out.println("[SERVER] Listening on port " + port + "...");
+        } catch (Exception e) {}
+    }
 
-            while (true) {
+    @Override
+    public void run() {
+        try {
+            sslServerSocket = (SSLServerSocket) SSLServerSocketFactory
+                .getDefault()
+                .createServerSocket(port);
+
+            System.out.println("[" + LocalDateTime.now() + "] Listening on port " + port + "...");
+
+            while (!isStopped) {
                 Socket clientSocket = sslServerSocket.accept();
-                System.out.println("[SERVER] Connecting with " + clientSocket.getRemoteSocketAddress() + "...");
-
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 clientHandler.start();
             }
 
-            // sslServerSocket.close();
+        } catch (Exception e) {}
+    }
 
-        } catch (IOException e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
+    public void shutdown() {
+        try {
+            isStopped = true;
+            sslServerSocket.close();
+            join();
+
+        } catch (Exception e) {}
     }
 }

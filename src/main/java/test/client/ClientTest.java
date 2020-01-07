@@ -1,12 +1,12 @@
 package test.client;
 
-
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+
 
 public class ClientTest {
     private static String remoteHost = "127.0.0.1";
