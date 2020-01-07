@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.media.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="277.0" prefWidth="600.0"
+            style="-fx-background-color: #9e9e9e; -fx-border-color: #eeeeee; -fx-border-width: 2px;"
+            xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ihm.controller.BiometricVerificationController">
+   <children>
+      <MediaView fitHeight="200.0" fitWidth="200.0" layoutX="25.0" layoutY="30.0" AnchorPane.leftAnchor="30.0"
+                 AnchorPane.topAnchor="30.0"/>
+      <Button layoutX="331.0" layoutY="194.0" mnemonicParsing="false" text="Prendre la photo">
+         <font>
+            <Font name="Comic Sans MS" size="18.0"/>
+         </font>
+      </Button>
+      <Text layoutX="280.0" layoutY="91.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Veuillez vous placer au centre "
+            wrappingWidth="347.8125">
+         <font>
+            <Font name="Comic Sans MS" size="24.0"/>
+         </font>
+      </Text>
+      <Text layoutX="280.0" layoutY="124.0" strokeType="OUTSIDE" strokeWidth="0.0" text="de l'image dans l'ellipse">
+         <font>
+            <Font name="Comic Sans MS" size="24.0"/>
+         </font>
+      </Text>
+   </children>
+</AnchorPane>
