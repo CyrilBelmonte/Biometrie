@@ -20,7 +20,7 @@ public class Server extends Thread {
         start();
     }
 
-    public void listenBlock() {
+    public void listenAndBlock() {
         listen();
 
         try {
