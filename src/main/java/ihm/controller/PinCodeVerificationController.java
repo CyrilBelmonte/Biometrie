@@ -3,57 +3,49 @@ package ihm.controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
+
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ResourceBundle;
 
-public class PinCodeVerificationController {
 
-    private Stage previousStage;
+public class PinCodeVerificationController implements Initializable {
 
+    private int numberOfTry;
     @FXML
     private Button fourButtonHandler;
-
     @FXML
     private Button validateButton;
-
     @FXML
     private Button oneButton;
-
     @FXML
     private Button cancelButton;
-
     @FXML
     private Button threeButton;
-
     @FXML
     private Button sevenButton;
-
     @FXML
     private Button twoButton;
-
     @FXML
     private Button eightButton;
-
     @FXML
     private Button sixButton;
-
     @FXML
     private Button nineButton;
-
     @FXML
     private Label codeLabel;
-
     @FXML
     private Button zeroButton;
-
     @FXML
     private Button fiveButton;
 
@@ -135,7 +127,6 @@ public class PinCodeVerificationController {
         }
     }
 
-
     @FXML
     void sevenButtonHandler(ActionEvent event) {
         if (this.codeLabel.getText().length() >= 4) {
@@ -201,30 +192,49 @@ public class PinCodeVerificationController {
     }
 
     @FXML
-    void validateButton(ActionEvent event) {
+    void validateButton(ActionEvent event) throws IOException {
         // TODO FONCTION SI LE CLIEN EST AUTHENTIFIÉ
-        Stage primaryStage = new Stage();
-
-        try {
+        boolean goodCodeOnCard = true;
+        String username = "TMP";
+        if (goodCodeOnCard) {
             FXMLLoader loader = new FXMLLoader();
-            final URL url = this.getClass().getResource("/fxml/PasswordVerification.fxml");
-            final FXMLLoader fxmlLoader = new FXMLLoader(url);
-            // Chargement du FXML.
-            final AnchorPane root = (AnchorPane) fxmlLoader.load();
-            // Création de la scène.
-            final Scene scene = new Scene(root, 318, 362);
-            primaryStage.setScene(scene);
-            primaryStage.setResizable(false);
-        } catch (IOException ex) {
-            System.err.println("Erreur au chargement: " + ex);
+            loader.setLocation(getClass().getResource("/fxml/PasswordVerification.fxml"));
+
+            Parent parent = loader.load();
+
+            PasswordVerificationController controller = loader.getController();
+            controller.initUserName(username);
+
+
+            Scene scene = new Scene(parent, 318, 362);
+            Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            window.setScene(scene);
+            window.show();
+        } else {
+            this.codeLabel.setText("");
+            numberOfTry++;
+            if (numberOfTry < 3) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Attention au PIN");
+                alert.setHeaderText(null);
+                alert.setContentText("Pin incorrecte, il reste " + (3 - numberOfTry) + " essai");
+                alert.showAndWait();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Attention au PIN");
+                alert.setHeaderText(null);
+                alert.setContentText("Pin incorrecte, vous avez déjà fait " + numberOfTry + " essai votre carte est détruite \n Fin du programme d'authentification");
+                alert.showAndWait();
+                System.exit(-1);
+            }
         }
-        primaryStage.setTitle("Login with password");
-        primaryStage.initStyle(StageStyle.UNDECORATED);
-        primaryStage.show();
     }
 
-    public void getDataFromPreviousStage(Stage windowStage){
-        windowStage.close();
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        numberOfTry = 0;
     }
+
+
 }
 

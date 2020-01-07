@@ -1,6 +1,5 @@
 package ihm.launchers;
 
-import ihm.controller.InsertSmartCardController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,29 +11,26 @@ import java.io.IOException;
 
 public class MainApp extends Application {
 
+
     @Override
-    public void start(Stage primaryStage) {
-
-        try {
-
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/fxml/InsertSmartCard.fxml"));
-            Parent parent = loader.load();
-
-            InsertSmartCardController controller = loader.getController();
+    public void start(Stage stage) throws IOException {
 
 
-            Scene scene = new Scene(parent, 300, 300);
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("/fxml/InsertSmartCard.fxml"));
 
-            primaryStage.setScene(scene);
-            primaryStage.setResizable(false);
-            primaryStage.setTitle("Insert smart card");
-            primaryStage.initStyle(StageStyle.UNDECORATED);
-            primaryStage.show();
-            primaryStage.hide();
-        } catch (IOException ex) {
+        Parent parent = loader.load();
 
-            System.err.println("Erreur au chargement: " + ex);
-        }
+        Scene scene = new Scene(parent, 300, 300);
+        stage.setScene(scene);
+        stage.setTitle("Insert smart card");
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.show();
+    }
+
+
+    public static void main(String[] args) {
+        nu.pattern.OpenCV.loadShared();
+        launch(args);
     }
 }
