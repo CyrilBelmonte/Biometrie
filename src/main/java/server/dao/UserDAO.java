@@ -30,7 +30,7 @@ public class UserDAO extends DAO {
     }
 
     public boolean update(User user) {
-        String query = "UPDATE users SET firstName = ?, lastName = ?, email = ?, isAdmin = ?, " +
+        String query = "UPDATE users SET firstName = ?, lastName = ?, email = ?, is_admin = ?, " +
                        "x = ?, y = ?, password = ?, biometric_data = ? WHERE id = ?";
 
         boolean hasSucceeded = false;
