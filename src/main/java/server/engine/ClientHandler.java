@@ -178,15 +178,45 @@ public class ClientHandler extends Thread {
                 Session session = SessionsManager.getInstance().getSession(sessionKey);
                 User user = session.getUser();
 
+                Tools.printLogMessage(String.valueOf(clientID), " | User corresponding to the session: " + user.getFirstName() + " " + user.getLastName());
+                Tools.printLogMessage(String.valueOf(clientID), " | Check if " + user.getFirstName() + " " + user.getLastName() + " has the required privileges to create a user...");
+
                 if (!user.isAdmin()) {
                     send("REPLY;ERROR;PRIVILEGES_ERROR");
                     throw new Exception("Admin privileges are required to perform this action: CREATE");
                 }
 
-                // Do something
-                // ...
+                Tools.printLogMessage(String.valueOf(clientID), " | Access granted!");
 
-                send("REPLY;OK;NULL");
+                String[] splitData = data.split(",");
+
+                if (splitData.length != 8) {
+                    send("REPLY;BAD_REQUEST;MALFORMED_DATA");
+                    throw new Exception("Bad request");
+                }
+
+                String firstName = splitData[0];
+                String lastName = splitData[1];
+                String email = splitData[2];
+                boolean isAdmin = Boolean.valueOf(splitData[3]);
+                int x = Integer.valueOf(splitData[4]);
+                int y = Integer.valueOf(splitData[5]);
+                String password = splitData[6];
+                String biometricData = splitData[7];
+
+                Tools.printLogMessage(String.valueOf(clientID), " | Inserting of the user into the database: " + firstName + " " + lastName + "...");
+
+                User userToInsert = new User(firstName, lastName, email, isAdmin, x, y, password, biometricData);
+                boolean hasSucceeded = DAOFactory.getUserDAO().insert(userToInsert);
+
+                if (hasSucceeded) {
+                    Tools.printLogMessage(String.valueOf(clientID), " | OK!");
+                    send("REPLY;OK;" + userToInsert.getId());
+
+                } else {
+                    Tools.printLogMessageErr(String.valueOf(clientID), " | Insertion error");
+                    send("REPLY;ERROR;NULL");
+                }
 
             } else if (request[0].equals("UPDATE")) {
                 Tools.printLogMessage(String.valueOf(clientID), "CLIENT -> SERVER UPDATE REQUEST");
@@ -206,15 +236,20 @@ public class ClientHandler extends Thread {
                 Session session = SessionsManager.getInstance().getSession(sessionKey);
                 User user = session.getUser();
 
+                Tools.printLogMessage(String.valueOf(clientID), " | User corresponding to the session: " + user.getFirstName() + " " + user.getLastName());
+                Tools.printLogMessage(String.valueOf(clientID), " | Check if " + user.getFirstName() + " " + user.getLastName() + " has the required privileges to update a user...");
+
                 if (!user.isAdmin()) {
                     send("REPLY;ERROR;PRIVILEGES_ERROR");
                     throw new Exception("Admin privileges are required to perform this action: UPDATE");
                 }
 
+                Tools.printLogMessage(String.valueOf(clientID), " | Access granted!");
+
                 // Do something
                 // ...
 
-                send("REPLY;OK;NULL");
+                send("REPLY;ERROR;NOT_IMPLEMENTED");
             }
 
         } catch (IOException e) {

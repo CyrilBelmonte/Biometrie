@@ -38,7 +38,7 @@ public class ClientTest {
         outputStream.close();
         socket.close();
 
-        // COMMANDS
+        // GET TEST
         socket = createSocket(remoteHost, remotePort);
         inputStream = new BufferedInputStream(socket.getInputStream());
         outputStream = new BufferedOutputStream(socket.getOutputStream());
@@ -46,6 +46,19 @@ public class ClientTest {
         send("GET;INDEX;" + sessionKey, outputStream);
         String reply3 = receive(1024, inputStream);
         System.out.println(reply3);
+
+        inputStream.close();
+        outputStream.close();
+        socket.close();
+
+        // INSERT TEST
+        socket = createSocket(remoteHost, remotePort);
+        inputStream = new BufferedInputStream(socket.getInputStream());
+        outputStream = new BufferedOutputStream(socket.getOutputStream());
+
+        send("CREATE;Tom,DOE,tom.doe@cergy.fr,false,1,2,7a7fd7808e663cbf88bded12a5098c14,ZRoRIAaTUcATXwc7oqlTUQ==;" + sessionKey, outputStream);
+        String reply4 = receive(1024, inputStream);
+        System.out.println(reply4);
 
         inputStream.close();
         outputStream.close();
