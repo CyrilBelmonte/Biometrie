@@ -1,19 +1,15 @@
 package ihm.utils.filter;
 
 
-import java.util.*;
+import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.*;
-import java.awt.MediaTracker.*;
-import java.io.*;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
-import javax.imageio.*;
+import java.io.File;
 
 
 public class Prewitt {
 
-    public void filtre(String fil) {
+    public void filtre(String fil, String path) {
         try {
             BufferedImage img = ImageIO.read(new File(fil));
             int[][] pixel = new int[img.getWidth()][img.getHeight()];
@@ -83,7 +79,7 @@ public class Prewitt {
                 }
             }
             // enregistrement d'image
-            ImageIO.write(img, "png", new File("src\\resources\\tmp\\Prewitt.png"));//ImageIO.write()//;
+            ImageIO.write(img, "png", new File(path + "Prewitt.png"));//ImageIO.write()//;
         } catch (Exception e) {
             System.err.println("erreur -> " + e.getMessage());
         }

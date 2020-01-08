@@ -1,15 +1,6 @@
 package ihm.controller;
 
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import ihm.utils.Utils;
 import ihm.utils.filter.Canny;
 import ihm.utils.filter.Laplacien;
@@ -20,7 +11,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -28,10 +18,20 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static org.opencv.videoio.Videoio.CV_CAP_PROP_FRAME_HEIGHT;
+import static org.opencv.videoio.Videoio.CV_CAP_PROP_FRAME_WIDTH;
 
 
 public class BiometricVerificationController implements Initializable {
@@ -49,10 +49,12 @@ public class BiometricVerificationController implements Initializable {
 
     private boolean cameraActive = false;
 
-    private static int cameraId = 0;
+    private static int cameraId = 1;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        capture.set(CV_CAP_PROP_FRAME_WIDTH, 1920);
+        capture.set(CV_CAP_PROP_FRAME_HEIGHT, 1080);
         if (!this.cameraActive) {
             // start the video capture
             this.capture.open(cameraId);
@@ -105,20 +107,23 @@ public class BiometricVerificationController implements Initializable {
 
         String filePath = "src\\resources\\tmp\\pictures.png";
 
-        Thread.sleep(2000);
+
         Canny canny = new Canny();
         canny.filtre(filePath);
+
+        System.out.println("test 1 ");
 
         Sobel sobel = new Sobel();
         sobel.filtre(filePath);
 
+        System.out.println("test 2 ");
+
         Laplacien laplacien = new Laplacien();
         laplacien.filtre(filePath);
 
+        System.out.println("test 3 ");
         Prewitt prewitt = new Prewitt();
-        prewitt.filtre(filePath);
-
-        Thread.sleep(2000);
+        prewitt.filtre(filePath, "src\resources\tmp");
 
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/fxml/DiffTest.fxml"));
@@ -144,7 +149,7 @@ public class BiometricVerificationController implements Initializable {
 
                 // if the frame is not empty, process it
                 if (!frame.empty()) {
-                    Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2GRAY);
+
                 }
 
             } catch (Exception e) {

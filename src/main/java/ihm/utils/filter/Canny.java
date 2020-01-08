@@ -1,16 +1,13 @@
 package ihm.utils.filter;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.*;
 import java.awt.image.BufferedImage;
-import javax.imageio.*;
+import java.io.File;
 
 
 public class Canny {
-
     public void filtre(String fil) {
-
-
         try {
             BufferedImage img = ImageIO.read(new File(fil));
             int[][] pixel = new int[img.getWidth()][img.getHeight()];
@@ -18,7 +15,6 @@ public class Canny {
 
 //***************************************************
 //Conversion enniveau du Gris
-
             for (int i = 0; i < img.getWidth(); i++) {
                 for (int j = 0; j < img.getHeight(); j++) {
 
