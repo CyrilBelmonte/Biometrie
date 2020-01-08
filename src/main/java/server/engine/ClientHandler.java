@@ -133,7 +133,27 @@ public class ClientHandler extends Thread {
                 Tools.printLogMessage(String.valueOf(clientID), "AUTHENTICATION PHASE COMPLETED!");
 
             } else if (request[0].equals("REQUEST")) {
-                // Nothing
+                Tools.printLogMessage(String.valueOf(clientID), "CLIENT -> SERVER REQUEST");
+                Tools.printLogMessage(String.valueOf(clientID), "=======================================");
+                String command = request[1];
+                String sessionKey = request[2];
+
+                if (!SessionsManager.getInstance().hasSession(sessionKey)) {
+                    send("REPLY;ERROR;UNKNOWN_SESSION");
+                    throw new Exception("The session key is incorrect or expired: " + sessionKey);
+                }
+
+                Tools.printLogMessage(String.valueOf(clientID), " | Command: " + command);
+                Tools.printLogMessage(String.valueOf(clientID), " | Session key: " + sessionKey);
+                Tools.printLogMessage(String.valueOf(clientID), " | The session key is valid!");
+
+                Session session = SessionsManager.getInstance().getSession(sessionKey);
+                User user = session.getUser();
+
+                // Do something
+                // ...
+
+                send("REPLY;OK;NULL");
             }
 
         } catch (IOException e) {
@@ -175,7 +195,7 @@ public class ClientHandler extends Thread {
 
         // Check the request format
         if (!((request.length == 3 && request[0].equals("AUTHENTICATION")) ||
-              (request.length == 4 && request[0].equals("REQUEST")))) {
+              (request.length == 3 && request[0].equals("REQUEST")))) {
 
             // We alert the client that the request is invalid
             send("REPLY;BAD_REQUEST;UNKNOWN_COMMAND");
