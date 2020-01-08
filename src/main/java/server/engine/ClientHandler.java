@@ -119,23 +119,28 @@ public class ClientHandler extends Thread {
                     throw new Exception("Error in the authentication phase " + phase);
                 }
 
-                if (!request[2].equals("CREATE_SESSION")) {
+                if (request[2].equals("CREATE_SESSION")) {
+                    Tools.printLogMessage(String.valueOf(clientID), " | Generating the session...");
+                    Session session = SessionsManager.getInstance().createSession(user);
+                    Tools.printLogMessage(String.valueOf(clientID), " | Session ID: " + session.getKey());
+                    Tools.printLogMessage(String.valueOf(clientID), " | The session is valid until (in case of inactivity): " + session.getExpirationDate());
+                    Tools.printLogMessage(String.valueOf(clientID), " | Sending the session key...");
+                    send("AUTHENTICATION;" + phase + ";" + session.getKey());
+
+                } else if (request[2].equals("TERMINATE")) {
+                    Tools.printLogMessage(String.valueOf(clientID), " | No session will be generated");
+
+                } else {
                     send("REPLY;BAD_REQUEST;UNKNOWN_COMMAND");
                     throw new Exception("Bad request");
                 }
 
-                Tools.printLogMessage(String.valueOf(clientID), " | Generating the session...");
-                Session session = SessionsManager.getInstance().createSession(user);
-                Tools.printLogMessage(String.valueOf(clientID), " | Session ID: " + session.getKey());
-                Tools.printLogMessage(String.valueOf(clientID), " | The session is valid until (in case of inactivity): " + session.getExpirationDate());
-                Tools.printLogMessage(String.valueOf(clientID), " | Sending the session key...");
-                send("AUTHENTICATION;" + phase + ";" + session.getKey());
                 Tools.printLogMessage(String.valueOf(clientID), "AUTHENTICATION PHASE COMPLETED!");
 
-            } else if (request[0].equals("REQUEST")) {
-                Tools.printLogMessage(String.valueOf(clientID), "CLIENT -> SERVER REQUEST");
+            } else if (request[0].equals("GET")) {
+                Tools.printLogMessage(String.valueOf(clientID), "CLIENT -> SERVER GET REQUEST");
                 Tools.printLogMessage(String.valueOf(clientID), "=======================================");
-                String command = request[1];
+                String requestedData = request[1];
                 String sessionKey = request[2];
 
                 if (!SessionsManager.getInstance().hasSession(sessionKey)) {
@@ -143,12 +148,68 @@ public class ClientHandler extends Thread {
                     throw new Exception("The session key is incorrect or expired: " + sessionKey);
                 }
 
-                Tools.printLogMessage(String.valueOf(clientID), " | Command: " + command);
+                Tools.printLogMessage(String.valueOf(clientID), " | Requested data: " + requestedData);
                 Tools.printLogMessage(String.valueOf(clientID), " | Session key: " + sessionKey);
                 Tools.printLogMessage(String.valueOf(clientID), " | The session key is valid!");
 
                 Session session = SessionsManager.getInstance().getSession(sessionKey);
                 User user = session.getUser();
+
+                // Do something
+                // ...
+
+                send("REPLY;OK;NULL");
+
+            } else if (request[0].equals("CREATE")) {
+                Tools.printLogMessage(String.valueOf(clientID), "CLIENT -> SERVER CREATE REQUEST");
+                Tools.printLogMessage(String.valueOf(clientID), "=======================================");
+                String data = request[1];
+                String sessionKey = request[2];
+
+                if (!SessionsManager.getInstance().hasSession(sessionKey)) {
+                    send("REPLY;ERROR;UNKNOWN_SESSION");
+                    throw new Exception("The session key is incorrect or expired: " + sessionKey);
+                }
+
+                Tools.printLogMessage(String.valueOf(clientID), " | Data: " + data);
+                Tools.printLogMessage(String.valueOf(clientID), " | Session key: " + sessionKey);
+                Tools.printLogMessage(String.valueOf(clientID), " | The session key is valid!");
+
+                Session session = SessionsManager.getInstance().getSession(sessionKey);
+                User user = session.getUser();
+
+                if (!user.isAdmin()) {
+                    send("REPLY;ERROR;PRIVILEGES_ERROR");
+                    throw new Exception("Admin privileges are required to perform this action: CREATE");
+                }
+
+                // Do something
+                // ...
+
+                send("REPLY;OK;NULL");
+
+            } else if (request[0].equals("UPDATE")) {
+                Tools.printLogMessage(String.valueOf(clientID), "CLIENT -> SERVER UPDATE REQUEST");
+                Tools.printLogMessage(String.valueOf(clientID), "=======================================");
+                String data = request[1];
+                String sessionKey = request[2];
+
+                if (!SessionsManager.getInstance().hasSession(sessionKey)) {
+                    send("REPLY;ERROR;UNKNOWN_SESSION");
+                    throw new Exception("The session key is incorrect or expired: " + sessionKey);
+                }
+
+                Tools.printLogMessage(String.valueOf(clientID), " | Data: " + data);
+                Tools.printLogMessage(String.valueOf(clientID), " | Session key: " + sessionKey);
+                Tools.printLogMessage(String.valueOf(clientID), " | The session key is valid!");
+
+                Session session = SessionsManager.getInstance().getSession(sessionKey);
+                User user = session.getUser();
+
+                if (!user.isAdmin()) {
+                    send("REPLY;ERROR;PRIVILEGES_ERROR");
+                    throw new Exception("Admin privileges are required to perform this action: UPDATE");
+                }
 
                 // Do something
                 // ...
@@ -163,8 +224,8 @@ public class ClientHandler extends Thread {
             Tools.printLogMessageErr(String.valueOf(clientID), " | " + e.getMessage());
 
         } finally {
-            // Close the socket
             try {
+                // Close the socket
                 close();
 
             } catch (IOException e) {}
@@ -194,8 +255,11 @@ public class ClientHandler extends Thread {
         Tools.printLogMessageErr("----->", "Payload: " + String.join(" ", request));
 
         // Check the request format
-        if (!((request.length == 3 && request[0].equals("AUTHENTICATION")) ||
-              (request.length == 3 && request[0].equals("REQUEST")))) {
+        if (request.length != 3 || !(
+            request[0].equals("AUTHENTICATION") ||
+            request[0].equals("GET") ||
+            request[0].equals("CREATE") ||
+            request[0].equals("UPDATE"))) {
 
             // We alert the client that the request is invalid
             send("REPLY;BAD_REQUEST;UNKNOWN_COMMAND");

@@ -9,6 +9,7 @@ CREATE TABLE users (
   firstName         VARCHAR(50),
   lastName          VARCHAR(50),
   email             VARCHAR(50),
+  is_admin          BOOLEAN,
   x                 INTEGER,
   y                 INTEGER,
   password          VARCHAR(100),

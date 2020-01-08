@@ -2,6 +2,7 @@ package test.server;
 
 import server.model.Session;
 import server.model.User;
+import server.tools.AES;
 import server.tools.SessionsManager;
 import server.tools.Tools;
 
@@ -12,8 +13,9 @@ public class SessionsTest {
     public static void main(String[] args) throws InterruptedException {
         SessionsManager sessionsManager = SessionsManager.getInstance();
 
-        User user = new User(12, "John", "DOE", "john.doe@cergy.fr",
-                             1, 2, Tools.hmacMD5(Tools.hmacMD5("password", "2"), "1"), "#AES#");
+        User user = new User(12, "John", "DOE", "john.doe@cergy.fr", false, 1, 2,
+            Tools.hmacMD5(Tools.hmacMD5("password", "1"), "2"),
+            AES.encrypt("biometric_data", "U8LmKx8/nSZ12bvD"));
 
         Session session = sessionsManager.createSession(user);
 

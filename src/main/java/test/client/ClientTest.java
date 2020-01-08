@@ -43,7 +43,7 @@ public class ClientTest {
         inputStream = new BufferedInputStream(socket.getInputStream());
         outputStream = new BufferedOutputStream(socket.getOutputStream());
 
-        send("REQUEST;GET_SOMETHING;" + sessionKey, outputStream);
+        send("GET;INDEX;" + sessionKey, outputStream);
         String reply3 = receive(1024, inputStream);
         System.out.println(reply3);
 

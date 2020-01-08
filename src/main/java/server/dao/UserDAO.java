@@ -30,7 +30,7 @@ public class UserDAO extends DAO {
     }
 
     public boolean update(User user) {
-        String query = "UPDATE users SET firstName = ?, lastName = ?, email = ?, " +
+        String query = "UPDATE users SET firstName = ?, lastName = ?, email = ?, isAdmin = ?, " +
                        "x = ?, y = ?, password = ?, biometric_data = ? WHERE id = ?";
 
         boolean hasSucceeded = false;
@@ -40,11 +40,12 @@ public class UserDAO extends DAO {
             statement.setString(1, user.getFirstName());
             statement.setString(2, user.getLastName());
             statement.setString(3, user.getEmail());
-            statement.setInt(4, user.getX());
-            statement.setInt(5, user.getY());
-            statement.setString(6, user.getPassword());
-            statement.setString(7, user.getBiometricData());
-            statement.setInt(8, user.getId());
+            statement.setBoolean(4, user.isAdmin());
+            statement.setInt(5, user.getX());
+            statement.setInt(6, user.getY());
+            statement.setString(7, user.getPassword());
+            statement.setString(8, user.getBiometricData());
+            statement.setInt(9, user.getId());
             int updatedTuples = statement.executeUpdate();
 
             if (updatedTuples > 0) {
@@ -61,8 +62,8 @@ public class UserDAO extends DAO {
     }
 
     public boolean insert(User user) {
-        String query = "INSERT INTO users (firstName, lastName, email, x, y, password, biometric_data)" +
-                       "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO users (firstName, lastName, email, is_admin, x, y, password, biometric_data)" +
+                       "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         boolean hasSucceeded = false;
 
@@ -71,10 +72,11 @@ public class UserDAO extends DAO {
             statement.setString(1, user.getFirstName());
             statement.setString(2, user.getLastName());
             statement.setString(3, user.getEmail());
-            statement.setInt(4, user.getX());
-            statement.setInt(5, user.getY());
-            statement.setString(6, user.getPassword());
-            statement.setString(7, user.getBiometricData());
+            statement.setBoolean(4, user.isAdmin());
+            statement.setInt(5, user.getX());
+            statement.setInt(6, user.getY());
+            statement.setString(7, user.getPassword());
+            statement.setString(8, user.getBiometricData());
             statement.executeUpdate();
 
             ResultSet result = statement.getGeneratedKeys();
@@ -102,12 +104,13 @@ public class UserDAO extends DAO {
                 String firstName = resultSet.getString("firstName");
                 String lastName = resultSet.getString("lastName");
                 String email = resultSet.getString("email");
+                boolean isAdmin = resultSet.getBoolean("is_admin");
                 int x = resultSet.getInt("x");
                 int y = resultSet.getInt("y");
                 String password = resultSet.getString("password");
                 String biometricData = resultSet.getString("biometric_data");
 
-                user = new User(id, firstName, lastName, email, x, y, password, biometricData);
+                user = new User(id, firstName, lastName, email, isAdmin, x, y, password, biometricData);
             }
 
         } catch (SQLException e) {
