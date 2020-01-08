@@ -1,9 +1,10 @@
 package server.engine;
 
+import server.tools.Tools;
+
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import java.net.Socket;
-import java.time.LocalDateTime;
 
 
 public class Server extends Thread {
@@ -36,7 +37,7 @@ public class Server extends Thread {
                 .getDefault()
                 .createServerSocket(port);
 
-            System.out.println("[" + LocalDateTime.now() + "] Listening on port " + port + "...");
+            Tools.printLogMessage(" main ", "Listening on port " + port + "...");
 
             while (!isStopped) {
                 Socket clientSocket = sslServerSocket.accept();

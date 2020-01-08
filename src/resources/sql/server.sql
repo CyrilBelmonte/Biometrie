@@ -12,6 +12,7 @@ CREATE TABLE users (
   x                 INTEGER,
   y                 INTEGER,
   password          VARCHAR(100),
+  biometric_data    VARCHAR(1000),
 
   PRIMARY KEY (id)
 );

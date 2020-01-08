@@ -9,12 +9,13 @@ public class User {
     private int x;
     private int y;
     private String password;
+    private String biometricData;
 
-    public User(String firstName, String lastName, String email, int x, int y, String password) {
-        this(0, firstName, lastName, email, x, y, password);
+    public User(String firstName, String lastName, String email, int x, int y, String password, String biometricData) {
+        this(0, firstName, lastName, email, x, y, password, biometricData);
     }
 
-    public User(int id, String firstName, String lastName, String email, int x, int y, String password) {
+    public User(int id, String firstName, String lastName, String email, int x, int y, String password, String biometricData) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -22,6 +23,7 @@ public class User {
         this.x = x;
         this.y = y;
         this.password = password;
+        this.biometricData = biometricData;
     }
 
     public int getId() {
@@ -78,5 +80,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getBiometricData() {
+        return biometricData;
+    }
+
+    public void setBiometricData(String biometricData) {
+        this.biometricData = biometricData;
     }
 }

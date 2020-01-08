@@ -13,7 +13,7 @@ public class SessionsTest {
         SessionsManager sessionsManager = SessionsManager.getInstance();
 
         User user = new User(12, "John", "DOE", "john.doe@cergy.fr",
-                             1, 2, Tools.hmacMD5(Tools.hmacMD5("password", "2"), "1"));
+                             1, 2, Tools.hmacMD5(Tools.hmacMD5("password", "2"), "1"), "#AES#");
 
         Session session = sessionsManager.createSession(user);
 

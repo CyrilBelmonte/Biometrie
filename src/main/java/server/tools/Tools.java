@@ -3,6 +3,8 @@ package server.tools;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class Tools {
@@ -38,5 +40,21 @@ public class Tools {
         } catch (Exception e) {}
 
         return digest;
+    }
+
+    public static int getRandomNumber(int min, int max) {
+        return ThreadLocalRandom.current().nextInt(min, max + 1);
+    }
+
+    public static int getSeed() {
+        return getRandomNumber(100000, 999999);
+    }
+
+    public static void printLogMessage(String source, String message) {
+        System.out.println("[" + LocalDateTime.now() + "] [" + source + "] " + message);
+    }
+
+    public static void printLogMessageErr(String source, String error) {
+        System.err.println("[" + LocalDateTime.now() + "] [" + source + "] " + error);
     }
 }

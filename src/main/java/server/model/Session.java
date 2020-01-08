@@ -16,7 +16,7 @@ public class Session {
     }
 
     public void resetExpirationDate() {
-        expirationDate = LocalDateTime.now().plus(10, ChronoUnit.MINUTES);
+        expirationDate = LocalDateTime.now().plus(5, ChronoUnit.MINUTES);
     }
 
     public boolean isExpired() {
