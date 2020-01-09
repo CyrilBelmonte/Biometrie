@@ -15,19 +15,17 @@ import javax.smartcardio.TerminalFactory;
  * @author Henri
  */
 public class smartcardApi {
-    private static CardTerminal terminal;
-    private static Card carte;
-    private static int i;
-    private static String texte = new String();
 
     static public List<CardTerminal> getTerminals() throws CardException {
         return TerminalFactory.getDefault().terminals().list();
 
     }
 
+
     static public String toString(byte[] byteTab) {
         String texte = "";
         String hexNombre;
+        int i;
         for (i = 0; i < byteTab.length; i++) {
             hexNombre = "";
             hexNombre = Integer.toHexString(byteTab[i]);
@@ -59,8 +57,8 @@ public class smartcardApi {
         ResponseAPDU r;
         try {
             r = channel.transmit(command);
-            texte = toString(r.getData());
-            System.out.println(texte);
+            String text = toString(r.getData());
+            System.out.println(text);
             int SW1 = r.getSW1();
             if (SW1 == 144) {
                 System.out.println("Auth Success");
@@ -170,8 +168,8 @@ public class smartcardApi {
         ResponseAPDU r;
         try {
             r = channel.transmit(command);
-            texte = toString(r.getData());
-            System.out.println(texte);
+            String text = toString(r.getData());
+            System.out.println(text);
             int SW1 = r.getSW1();
             if (SW1 == 144) {
                 System.out.println("Read successfully executed");
@@ -196,8 +194,8 @@ public class smartcardApi {
         ResponseAPDU r;
         try {
             r = channel.transmit(command);
-            texte = toString(r.getData());
-            System.out.println(texte);
+            String text = toString(r.getData());
+            System.out.println(text);
             int SW1 = r.getSW1();
             if (SW1 == 144) {
                 System.out.println("Update successfully executed");
@@ -220,8 +218,8 @@ public class smartcardApi {
         ResponseAPDU r;
         try {
             r = channel.transmit(command);
-            texte = toString(r.getData());
-            System.out.println(texte);
+            String text = toString(r.getData());
+            System.out.println(text);
             int SW1 = r.getSW1();
             if (SW1 == 144) {
                 System.out.println("Auth Success");
@@ -242,9 +240,9 @@ public class smartcardApi {
 
     public static void main(String[] args) throws CardException {
         List<CardTerminal> terminauxDispos = smartcardApi.getTerminals();
-        terminal = terminauxDispos.get(0);
+        CardTerminal terminal = terminauxDispos.get(0);
         System.out.println(terminal.toString());
-        carte = terminal.connect("T=0");
+        Card carte = terminal.connect("T=0");
         System.out.println(toString(carte.getATR().getBytes()));
         CardChannel channel = carte.getBasicChannel();
 
@@ -272,8 +270,8 @@ public class smartcardApi {
             e.printStackTrace();
         }
         System.out.println("reponse : " + (byte) r.getData()[0]);
-        texte = toString(r.getData());
-        System.out.println(texte);
+        String text = toString(r.getData());
+        System.out.println(text);
     }
 
     private static void runTest1(CardChannel channel) {
