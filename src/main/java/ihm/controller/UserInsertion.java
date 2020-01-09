@@ -2,6 +2,7 @@ package ihm.controller;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -13,7 +14,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.stage.FileChooser;
 import server.tools.AES;
 import server.tools.Tools;
 import smartcard.smartcardApi;
@@ -103,6 +106,14 @@ public class UserInsertion {
 
     @FXML
     private TextField biometryField;
+
+    @FXML
+    void biometryFieldHandler(MouseEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select the photo of a user");
+        File file = fileChooser.showOpenDialog(biometryField.getScene().getWindow());
+        biometryField.setText(file.toString());
+    }
 
     @FXML
     void createUserButtonHandler(ActionEvent event) {

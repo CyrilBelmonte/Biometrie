@@ -465,6 +465,19 @@ public class UserAuthentication {
 
                         stopAcquisition();
                         close();
+
+                        try {
+                            if (sessionKey != null) {
+                                openSocket();
+                                send("DELETE;SESSION;" + sessionKey);
+                                receive(1024);
+                                close();
+                            }
+
+                        } catch (Exception e) {}
+
+                        sessionKey = null;
+                        biometryData = null;
                     }
 
                     Thread.sleep(1000);

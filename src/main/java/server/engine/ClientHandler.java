@@ -259,6 +259,33 @@ public class ClientHandler extends Thread {
                 // ...
 
                 send("REPLY;ERROR;NOT_IMPLEMENTED");
+
+            } else if (request[0].equals("DELETE")) {
+                Tools.printLogMessage(String.valueOf(clientID), "CLIENT -> SERVER DELETE REQUEST");
+                Tools.printLogMessage(String.valueOf(clientID), "=======================================");
+                String data = request[1];
+                String sessionKey = request[2];
+
+                if (!SessionsManager.getInstance().hasSession(sessionKey)) {
+                    send("REPLY;ERROR;UNKNOWN_SESSION");
+                    throw new Exception("The session key is incorrect or expired: " + sessionKey);
+                }
+
+                Tools.printLogMessage(String.valueOf(clientID), " | Data: " + data);
+                Tools.printLogMessage(String.valueOf(clientID), " | Session key: " + sessionKey);
+                Tools.printLogMessage(String.valueOf(clientID), " | The session key is valid!");
+
+                if (!request[1].equals("SESSION")) {
+                    send("REPLY;BAD_REQUEST;UNKNOWN_COMMAND");
+                    throw new Exception("Bad request");
+                }
+
+                Tools.printLogMessage(String.valueOf(clientID), " | Invalidating the session...");
+                Session session = SessionsManager.getInstance().getSession(sessionKey);
+                session.invalidate();
+                Tools.printLogMessage(String.valueOf(clientID), " | Session destroyed!");
+
+                send("REPLY;OK;NULL");
             }
 
         } catch (IOException e) {
@@ -303,7 +330,8 @@ public class ClientHandler extends Thread {
             request[0].equals("AUTHENTICATION") ||
             request[0].equals("GET") ||
             request[0].equals("CREATE") ||
-            request[0].equals("UPDATE"))) {
+            request[0].equals("UPDATE") ||
+            request[0].equals("DELETE"))) {
 
             // We alert the client that the request is invalid
             send("REPLY;BAD_REQUEST;UNKNOWN_COMMAND");

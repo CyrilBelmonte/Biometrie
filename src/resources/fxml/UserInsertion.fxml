@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="500.0" maxWidth="400.0" minHeight="500.0" minWidth="400.0" prefHeight="500.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ihm.controller.UserInsertion">
+<AnchorPane maxHeight="500.0" maxWidth="400.0" minHeight="500.0" minWidth="400.0" prefHeight="500.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ihm.controller.UserInsertion">
    <children>
       <Pane layoutX="105.0" layoutY="62.0" prefHeight="485.0" prefWidth="407.0" style="-fx-background-color: #fff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -129,7 +129,7 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="biometryField" layoutX="132.0" layoutY="161.0" prefHeight="25.0" prefWidth="228.0" promptText="Path of a photo" />
+                              <TextField fx:id="biometryField" editable="false" layoutX="132.0" layoutY="161.0" onMouseClicked="#biometryFieldHandler" prefHeight="25.0" prefWidth="228.0" promptText="Click to select a photo" />
                               <ImageView fitHeight="65.0" fitWidth="159.0" layoutX="169.0" layoutY="32.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@../images/userinsertion/add-user.png" />

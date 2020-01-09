@@ -23,6 +23,10 @@ public class Session {
         return expirationDate.isBefore(LocalDateTime.now());
     }
 
+    public void invalidate() {
+        expirationDate = LocalDateTime.now();
+    }
+
     public User getUser() {
         return user;
     }
