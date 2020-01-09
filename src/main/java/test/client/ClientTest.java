@@ -43,7 +43,7 @@ public class ClientTest {
         inputStream = new BufferedInputStream(socket.getInputStream());
         outputStream = new BufferedOutputStream(socket.getOutputStream());
 
-        send("GET;INDEX;" + sessionKey, outputStream);
+        send("GET;IS_ADMIN;" + sessionKey, outputStream);
         String reply3 = receive(1024, inputStream);
         System.out.println(reply3);
 

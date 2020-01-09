@@ -18,9 +18,9 @@ public class MainInscription extends Application {
 
         Parent parent = loader.load();
 
-        Scene scene = new Scene(parent, 400 - 10, 500);
+        Scene scene = new Scene(parent, 390, 500);
         stage.setScene(scene);
-        stage.setTitle("Insert smart card");
+        stage.setTitle("Administration center");
         stage.setResizable(false);
         stage.show();
     }

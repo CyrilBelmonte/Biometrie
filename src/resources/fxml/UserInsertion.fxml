@@ -18,7 +18,7 @@
    <children>
       <Pane layoutX="105.0" layoutY="62.0" prefHeight="485.0" prefWidth="407.0" style="-fx-background-color: #fff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <TabPane layoutX="-1.0" layoutY="-2.0" maxHeight="500.0" maxWidth="400.0" minHeight="500.0" minWidth="400.0" prefHeight="500.0" prefWidth="400.0" tabClosingPolicy="UNAVAILABLE" tabMinWidth="150.0">
+            <TabPane fx:id="tabPane" layoutX="-1.0" layoutY="-2.0" maxHeight="500.0" maxWidth="400.0" minHeight="500.0" minWidth="400.0" prefHeight="500.0" prefWidth="400.0" tabClosingPolicy="UNAVAILABLE" tabMinWidth="150.0">
               <tabs>
                 <Tab fx:id="authTab" text="Authentication">
                   <content>
@@ -112,7 +112,7 @@
                               </Label>
                               <TextField fx:id="lastNameField" layoutX="132.0" layoutY="233.0" prefHeight="25.0" prefWidth="228.0" />
                               <TextField fx:id="emailField" layoutX="132.0" layoutY="271.0" prefHeight="25.0" prefWidth="228.0" />
-                              <PasswordField fx:id="userPinField" editable="false" layoutX="132.0" layoutY="307.0" prefWidth="228.0" promptText="Required length: 6" />
+                              <PasswordField fx:id="userPinField" layoutX="132.0" layoutY="307.0" prefWidth="228.0" promptText="Required length: 6" />
                               <Label layoutX="37.0" layoutY="310.0" text="PIN code">
                                  <font>
                                     <Font size="14.0" />

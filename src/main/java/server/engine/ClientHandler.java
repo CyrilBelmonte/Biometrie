@@ -155,10 +155,19 @@ public class ClientHandler extends Thread {
                 Session session = SessionsManager.getInstance().getSession(sessionKey);
                 User user = session.getUser();
 
-                // Do something
-                // ...
+                Tools.printLogMessage(String.valueOf(clientID), " | User corresponding to the session: " + user.getFirstName() + " " + user.getLastName());
 
-                send("REPLY;OK;NULL");
+                if (!request[1].equals("IS_ADMIN")) {
+                    send("REPLY;BAD_REQUEST;UNKNOWN_COMMAND");
+                    throw new Exception("Bad request");
+                }
+
+                if (user.isAdmin()) {
+                    send("REPLY;OK;true");
+
+                } else {
+                    send("REPLY;OK;false");
+                }
 
             } else if (request[0].equals("CREATE")) {
                 Tools.printLogMessage(String.valueOf(clientID), "CLIENT -> SERVER CREATE REQUEST");

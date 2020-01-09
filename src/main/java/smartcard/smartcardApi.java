@@ -477,73 +477,73 @@ public class smartcardApi {
         }
     }
 
-    static class InvalidNumberOfDigitsException extends Exception {
+    public static class InvalidNumberOfDigitsException extends Exception {
         public InvalidNumberOfDigitsException(String errorMessage) {
             super(errorMessage);
         }
     }
 
-    static class InvalidCSCIdException extends Exception {
+    public static class InvalidCSCIdException extends Exception {
         public InvalidCSCIdException(String errorMessage) {
             super(errorMessage);
         }
     }
 
-    static class InvalidSecretCodeException extends Exception {
+    public static class InvalidSecretCodeException extends Exception {
         public InvalidSecretCodeException(String errorMessage) {
             super(errorMessage);
         }
     }
 
-    static class UnknownModeException extends Exception {
+    public static class UnknownModeException extends Exception {
         public UnknownModeException(String errorMessage) {
             super(errorMessage);
         }
     }
 
-    static class InvalidLcValueException extends Exception {
+    public static class InvalidLcValueException extends Exception {
         public InvalidLcValueException(String errorMessage) {
             super(errorMessage);
         }
     }
 
-    static class MaxPresentationExceededException extends Exception {
+    public static class MaxPresentationExceededException extends Exception {
         public MaxPresentationExceededException(String errorMessage) {
             super(errorMessage);
         }
     }
 
-    static class InvalidP2ParameterException extends Exception {
+    public static class InvalidP2ParameterException extends Exception {
         public InvalidP2ParameterException(String errorMessage) {
             super(errorMessage);
         }
     }
 
-    static class InvalidInstructionByteException extends Exception {
+    public static class InvalidInstructionByteException extends Exception {
         public InvalidInstructionByteException(String errorMessage) {
             super(errorMessage);
         }
     }
 
-    static class MemoryErrorException extends Exception {
+    public static class MemoryErrorException extends Exception {
         public MemoryErrorException(String errorMessage) {
             super(errorMessage);
         }
     }
 
-    static class SecurityNotSatisfiedException extends Exception {
+    public static class SecurityNotSatisfiedException extends Exception {
         public SecurityNotSatisfiedException(String errorMessage) {
             super(errorMessage);
         }
     }
 
-    static class InvalidLenghtOfExpectedDataException extends Exception {
+    public static class InvalidLenghtOfExpectedDataException extends Exception {
         public InvalidLenghtOfExpectedDataException(String errorMessage) {
             super(errorMessage);
         }
     }
 
-    static class UnknownException extends Exception {
+    public static class UnknownException extends Exception {
         public UnknownException(String errorMessage) {
             super(errorMessage);
         }
