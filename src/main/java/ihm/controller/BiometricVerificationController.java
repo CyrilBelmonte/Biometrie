@@ -40,6 +40,9 @@ public class BiometricVerificationController implements Initializable {
 
     private Image image;
     private Mat frameTmp;
+
+    private static int LIMIT = 90;
+
     @FXML
     private ImageView cameraImage;
 
@@ -49,7 +52,7 @@ public class BiometricVerificationController implements Initializable {
 
     private boolean cameraActive = false;
 
-    private static int cameraId = 1;
+    private static int cameraId = 0;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -105,25 +108,23 @@ public class BiometricVerificationController implements Initializable {
 
         saveToFile(image);
 
-        String filePath = "src\\resources\\tmp\\pictures.png";
+        String fileIn = "src\\resources\\tmp\\pictures.png";
+        String fileOut = "src\\resources\\tmp\\";
 
 
-        Canny canny = new Canny();
-        canny.filtre(filePath);
+        Canny canny = new Canny(LIMIT);
+        canny.filterImg(fileIn, fileOut);
 
-        System.out.println("test 1 ");
 
-        Sobel sobel = new Sobel();
-        sobel.filtre(filePath);
+        Sobel sobel = new Sobel(LIMIT);
+        sobel.filterImg(fileIn, fileOut);
 
-        System.out.println("test 2 ");
 
-        Laplacien laplacien = new Laplacien();
-        laplacien.filtre(filePath);
+        Laplacien laplacien = new Laplacien(LIMIT);
+        laplacien.filterImg(fileIn, fileOut);
 
-        System.out.println("test 3 ");
-        Prewitt prewitt = new Prewitt();
-        prewitt.filtre(filePath, "src\resources\tmp");
+        Prewitt prewitt = new Prewitt(LIMIT);
+        prewitt.filterImg(fileIn, fileOut);
 
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/fxml/DiffTest.fxml"));

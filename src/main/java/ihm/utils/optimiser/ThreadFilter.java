@@ -7,33 +7,34 @@ import ihm.utils.filter.Sobel;
 
 public class ThreadFilter {
 
-    public void generateImgFiltered(String filePath) throws InterruptedException {
+    public void generateImgFiltered(String fileIn, String fileOut) throws InterruptedException {
+        /*
 
         Thread canny = new Thread() {
             public void run() {
                 Canny canny = new Canny();
-                canny.filtre(filePath);
+                canny.filterImg(fileIn, fileOut);
             }
         };
 
         Thread perwitt = new Thread() {
             public void run() {
                 Prewitt prewitt = new Prewitt();
-                prewitt.filtre(filePath,"src\\resources\\tmp");
+                prewitt.filterImg(fileIn, fileOut);
             }
         };
 
         Thread sobel = new Thread() {
             public void run() {
                 Sobel sobel = new Sobel();
-                sobel.filtre(filePath);
+                sobel.filterImg(fileIn, fileOut);
             }
         };
 
         Thread laplacien = new Thread() {
             public void run() {
                 Laplacien laplacien = new Laplacien();
-                laplacien.filtre(filePath);
+                laplacien.filterImg(fileIn, fileOut);
             }
         };
 
@@ -45,6 +46,6 @@ public class ThreadFilter {
         canny.join();
         sobel.join();
         laplacien.join();
-        perwitt.join();
+        perwitt.join();*/
     }
 }

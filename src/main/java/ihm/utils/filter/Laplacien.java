@@ -1,57 +1,45 @@
 package ihm.utils.filter;
 
+import org.opencv.core.Mat;
+
 import java.awt.*;
 import java.io.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.*;
 
-
 public class Laplacien {
 
-    public void filtre(String fil) {
+    private int limit;
 
+    public Laplacien(int limit) {
+        this.limit = limit;
+    }
+
+    public void filterImg(String fileIn, String fileOut) {
 
         try {
-
-            BufferedImage img = ImageIO.read(new File(fil));
+            BufferedImage img = ImageIO.read(new File(fileIn));
             int[][] pixel = new int[img.getWidth()][img.getHeight()];
             int x, y, g;
-
-//***************************************************
-//Conversion enniveau du Gris
 
             for (int i = 0; i < img.getWidth(); i++) {
                 for (int j = 0; j < img.getHeight(); j++) {
 
-                    Color pixelcolor = new Color(img.getRGB(i, j));
+                    Color pixelColor = new Color(img.getRGB(i, j));
 
-                    int r = pixelcolor.getRed();
-                    int gb = pixelcolor.getGreen();
-                    int b = pixelcolor.getBlue();
+                    int r = pixelColor.getRed();
+                    int gb = pixelColor.getGreen();
+                    int b = pixelColor.getBlue();
 
                     int hy = (r + gb + b) / 3;
 
                     int rgb = new Color(hy, hy, hy).getRGB();
 
-                    // changer la couleur de pixel avec la nouvelle couleur inversée
                     img.setRGB(i, j, rgb);
-                }
-            }
-//***************************************************  	
-
-            // parcourir les pixels de l'image
-            for (int i = 0; i < img.getWidth(); i++) {
-                for (int j = 0; j < img.getHeight(); j++) {
-
-                    // recuperer couleur de chaque pixel
-                    Color pixelcolor = new Color(img.getRGB(i, j));
-
-                    // recuperer les valeur rgb (rouge ,vert ,bleu) de cette couleur
                     pixel[i][j] = img.getRGB(i, j);
                 }
             }
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
+            //Apply Laplace filter
             for (int i = 1; i < img.getWidth() - 2; i++) {
                 for (int j = 1; j < img.getHeight() - 2; j++) {
 
@@ -60,28 +48,34 @@ public class Laplacien {
                     pixel[i][j] = x;
                 }
             }
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-
-//**********************************************************************************
+            //Record in the image
             for (int i = 0; i < img.getWidth(); i++) {
                 for (int j = 0; j < img.getHeight(); j++) {
 
-                    Color pixelcolor = new Color(pixel[i][j]);
+                    Color pixelColor = new Color(pixel[i][j]);
 
-                    int r = pixelcolor.getRed();
-                    int gb = pixelcolor.getGreen();
-                    int b = pixelcolor.getBlue();
+                    int r = pixelColor.getRed();
+                    int gb = pixelColor.getGreen();
+                    int b = pixelColor.getBlue();
+                    int hy = (r + gb + b) / 3;
 
-                    int rgb = new Color(r, gb, b).getRGB();
-                    // changer la couleur de pixel avec la nouvelle couleur inversée
+                    if (hy < limit) {
+                        hy = 0;
+                    } else {
+                        hy = 255;
+                    }
+
+                    int rgb = new Color(hy, hy, hy).getRGB();
                     img.setRGB(i, j, rgb);
                 }
             }
-            // enregistrement d'image
-            ImageIO.write(img, "png", new File("src\\resources\\tmp\\" + "laplacien.png"));//ImageIO.write()//;
+            ImageIO.write(img, "png", new File(fileOut + "Laplacien.png"));//ImageIO.write()//;
         } catch (Exception e) {
             System.err.println("erreur -> " + e.getMessage());
         }
+    }
+
+    public Mat filterMat(Mat mat) {
+        return null;
     }
 }
