@@ -21,7 +21,6 @@ public class smartcardApi {
 
     }
 
-
     static public String toString(byte[] byteTab) {
         String texte = "";
         String hexNombre;
@@ -163,6 +162,99 @@ public class smartcardApi {
         return writeResult;
     }
 
+    public static int applyUserMode(CardChannel channel) throws InvalidLcValueException, UnknownException, InvalidP2ParameterException, MemoryErrorException, SecurityNotSatisfiedException, InvalidInstructionByteException {
+        byte[] issuerToUserCommand = {(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x80};
+        return update(channel, 0x04, 0x04, issuerToUserCommand);
+    }
+
+    public static CardChannel resetSmartcardConnexion(CardChannel channel, CardTerminal terminal, Card card) throws CardException {
+        System.out.println("ResetSmartCardConnexion :");
+        System.out.println("    closing current channel");
+        System.out.println("    disconnecting the card with a connection reset");
+        card.disconnect(true);
+        System.out.println("    connecting with card on T=0");
+        card = terminal.connect("T=0");
+        System.out.println("    returning card channel");
+        return card.getBasicChannel();
+    }
+
+    /***
+     *
+     * Returns -10 if failed to authenticate.
+     * Returns -11 if failed to update user info.
+     * Returns -12 if provided infos are too long.
+     * Retunrs -13 if failed to update user password.
+     * Returns -14 if failed to switch to user mode.
+     * Returns -15 if failed to reset card.
+     *
+     * @param channel
+     * @param info
+     * @return
+     */
+    public static int createUserCard(CardChannel channel, String info, int userPassword, CardTerminal terminal, Card card) {
+        System.out.println("Create user card from blank smartcard");
+
+        System.out.println("      Authenticating as default CSC0 user");
+        try {
+            authCSCDefault(channel, 0);
+            System.out.println("      Authentication success");
+        } catch (InvalidSecretCodeException | UnknownModeException | InvalidLcValueException | MaxPresentationExceededException | InvalidP2ParameterException | InvalidInstructionByteException | UnknownException e) {
+            System.out.println("      Error : Authentication as CSC0 failed");
+            if (e.getClass() == InvalidSecretCodeException.class) {
+                System.out.println("        Wrong password provided. Current card is not factory");
+            }
+            e.getMessage();
+            return -10;
+        }
+
+        System.out.println("      Writing user info in User1");
+        if (info.length() < 64) {
+            try {
+                updateUserData(channel, 1, info);
+                System.out.println("      Writing info success");
+            } catch (InvalidLcValueException | UnknownException | InvalidP2ParameterException | MemoryErrorException | SecurityNotSatisfiedException | InvalidInstructionByteException e) {
+                System.out.println("      Error : failed to write user info");
+                e.printStackTrace();
+                return -11;
+            }
+        } else {
+            System.out.println("      Error : given info are too long");
+            return -12;
+        }
+
+        System.out.println("      Updating user password");
+        try {
+            writeCSC(channel, 1, userPassword);
+            System.out.println("      Updating user password success");
+        } catch (InvalidNumberOfDigitsException | InvalidCSCIdException | InvalidLcValueException | InvalidP2ParameterException | InvalidInstructionByteException | MemoryErrorException | SecurityNotSatisfiedException | UnknownException e) {
+            System.out.println("      Error : failed to update user password");
+            e.printStackTrace();
+            return -13;
+        }
+
+        System.out.println("      Applying user mode");
+        try {
+            applyUserMode(channel);
+            System.out.println("      Applying user mode success");
+        } catch (InvalidLcValueException | UnknownException | InvalidP2ParameterException | MemoryErrorException | SecurityNotSatisfiedException | InvalidInstructionByteException e) {
+            System.out.println("      Error : failed to apply user mode");
+            e.printStackTrace();
+            return -14;
+        }
+
+        System.out.println("      Reseting card");
+        try {
+            resetSmartcardConnexion(channel, terminal, card);
+            System.out.println("      Reseting card success");
+        } catch (CardException e) {
+            System.out.println("      Error : failed to reset card");
+            e.printStackTrace();
+            return -15;
+        }
+        System.out.println("      Successfully went through user card creation sequence");
+        return 0;
+    }
+
     private static byte[] read(CardChannel channel, int p2, int le) throws UnknownModeException, InvalidLenghtOfExpectedDataException, SecurityNotSatisfiedException, InvalidP2ParameterException, InvalidInstructionByteException, UnknownException {
         CommandAPDU command = new CommandAPDU(0x80, 0xBE, 0x00, p2, le);
         ResponseAPDU r;
@@ -246,7 +338,21 @@ public class smartcardApi {
         System.out.println(toString(carte.getATR().getBytes()));
         CardChannel channel = carte.getBasicChannel();
 
+        String infos = "userinfo;on;card";
+        int password = 123456;
+
+        //createUserCard(channel, infos, password, terminal, carte );
+
+        try {
+            authCSC(channel, 1, password);
+            read(channel, 0x04, 0x04);
+        } catch (InvalidSecretCodeException | UnknownModeException | InvalidLcValueException | MaxPresentationExceededException | InvalidP2ParameterException | InvalidInstructionByteException | UnknownException | InvalidNumberOfDigitsException | InvalidLenghtOfExpectedDataException | SecurityNotSatisfiedException e) {
+            e.printStackTrace();
+        }
+
+
         //runTest3(channel);
+        /*
         try {
 
             byte[] b = read(channel, 0x07, 0x04);
@@ -255,7 +361,7 @@ public class smartcardApi {
             System.out.println(scr);
         } catch (UnknownModeException | InvalidLenghtOfExpectedDataException | SecurityNotSatisfiedException | InvalidP2ParameterException | InvalidInstructionByteException | UnknownException e) {
             e.printStackTrace();
-        }
+        }*/
 
         carte.disconnect(false);
 
@@ -353,7 +459,7 @@ public class smartcardApi {
         System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx");
     }
 
-    private static void runTest3(CardChannel channel){
+    private static void runTest3(CardChannel channel) {
         try {
             System.out.println("Authenticating as User0");
             System.out.println(authCSC(channel, 0, 234567));
