@@ -37,6 +37,19 @@ public class smartcardApi {
         return texte;
     }
 
+    /***
+     *
+     * @param channel
+     * @param CSCid
+     * @return
+     * @throws InvalidSecretCodeException
+     * @throws UnknownModeException
+     * @throws InvalidLcValueException
+     * @throws MaxPresentationExceededException
+     * @throws InvalidP2ParameterException
+     * @throws InvalidInstructionByteException
+     * @throws UnknownException
+     */
     static public int authCSCDefault(CardChannel channel, int CSCid) throws InvalidSecretCodeException, UnknownModeException, InvalidLcValueException, MaxPresentationExceededException, InvalidP2ParameterException, InvalidInstructionByteException, UnknownException {
 
         byte[] bytes;
@@ -76,6 +89,21 @@ public class smartcardApi {
         }
     }
 
+    /***
+     *
+     * @param channel
+     * @param CSCid
+     * @param password
+     * @return
+     * @throws InvalidSecretCodeException
+     * @throws UnknownModeException
+     * @throws InvalidLcValueException
+     * @throws MaxPresentationExceededException
+     * @throws InvalidP2ParameterException
+     * @throws InvalidInstructionByteException
+     * @throws UnknownException
+     * @throws InvalidNumberOfDigitsException
+     */
     static public int authCSC(CardChannel channel, int CSCid, int password) throws InvalidSecretCodeException, UnknownModeException, InvalidLcValueException, MaxPresentationExceededException, InvalidP2ParameterException, InvalidInstructionByteException, UnknownException, InvalidNumberOfDigitsException {
 
         if (CSCid == 0) CSCid = 0x07;
@@ -91,6 +119,21 @@ public class smartcardApi {
         }
     }
 
+    /***
+     *
+     * @param channel
+     * @param CSCid
+     * @param digitPassword
+     * @return
+     * @throws InvalidNumberOfDigitsException
+     * @throws InvalidCSCIdException
+     * @throws InvalidLcValueException
+     * @throws InvalidP2ParameterException
+     * @throws InvalidInstructionByteException
+     * @throws MemoryErrorException
+     * @throws SecurityNotSatisfiedException
+     * @throws UnknownException
+     */
     public static int writeCSC(CardChannel channel, int CSCid, int digitPassword) throws InvalidNumberOfDigitsException, InvalidCSCIdException, InvalidLcValueException, InvalidP2ParameterException, InvalidInstructionByteException, MemoryErrorException, SecurityNotSatisfiedException, UnknownException {
 
         if (CSCid == 0) CSCid = 0x06;
@@ -106,6 +149,18 @@ public class smartcardApi {
         }
     }
 
+    /***
+     *
+     * @param channel
+     * @param userId
+     * @return
+     * @throws InvalidP2ParameterException
+     * @throws InvalidLenghtOfExpectedDataException
+     * @throws UnknownModeException
+     * @throws InvalidInstructionByteException
+     * @throws SecurityNotSatisfiedException
+     * @throws UnknownException
+     */
     public static String readUserData(CardChannel channel, int userId) throws InvalidP2ParameterException, InvalidLenghtOfExpectedDataException, UnknownModeException, InvalidInstructionByteException, SecurityNotSatisfiedException, UnknownException {
         int p2 = 0;
         if (userId == 1) p2 = 0x10;
@@ -134,6 +189,19 @@ public class smartcardApi {
         return userData;
     }
 
+    /***
+     *
+     * @param channel
+     * @param userId
+     * @param data
+     * @return
+     * @throws InvalidLcValueException
+     * @throws UnknownException
+     * @throws InvalidP2ParameterException
+     * @throws MemoryErrorException
+     * @throws SecurityNotSatisfiedException
+     * @throws InvalidInstructionByteException
+     */
     public static int updateUserData(CardChannel channel, int userId, String data) throws InvalidLcValueException, UnknownException, InvalidP2ParameterException, MemoryErrorException, SecurityNotSatisfiedException, InvalidInstructionByteException {
         int p2 = 0;
         if (userId == 1) p2 = 0x10;
@@ -149,6 +217,18 @@ public class smartcardApi {
         return writeResult;
     }
 
+    /***
+     *
+     * @param channel
+     * @param userId
+     * @return
+     * @throws InvalidLcValueException
+     * @throws UnknownException
+     * @throws InvalidP2ParameterException
+     * @throws MemoryErrorException
+     * @throws SecurityNotSatisfiedException
+     * @throws InvalidInstructionByteException
+     */
     public static int resetUserData(CardChannel channel, int userId) throws InvalidLcValueException, UnknownException, InvalidP2ParameterException, MemoryErrorException, SecurityNotSatisfiedException, InvalidInstructionByteException {
         int p2 = 0;
         if (userId == 1) p2 = 0x10;
@@ -162,11 +242,30 @@ public class smartcardApi {
         return writeResult;
     }
 
+    /***
+     *
+     * @param channel
+     * @return
+     * @throws InvalidLcValueException
+     * @throws UnknownException
+     * @throws InvalidP2ParameterException
+     * @throws MemoryErrorException
+     * @throws SecurityNotSatisfiedException
+     * @throws InvalidInstructionByteException
+     */
     public static int applyUserMode(CardChannel channel) throws InvalidLcValueException, UnknownException, InvalidP2ParameterException, MemoryErrorException, SecurityNotSatisfiedException, InvalidInstructionByteException {
         byte[] issuerToUserCommand = {(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x80};
         return update(channel, 0x04, 0x04, issuerToUserCommand);
     }
 
+    /***
+     *
+     * @param channel
+     * @param terminal
+     * @param card
+     * @return
+     * @throws CardException
+     */
     public static CardChannel resetSmartcardConnexion(CardChannel channel, CardTerminal terminal, Card card) throws CardException {
         System.out.println("ResetSmartCardConnexion :");
         System.out.println("    closing current channel");
@@ -191,7 +290,7 @@ public class smartcardApi {
      * @param info
      * @return
      */
-    public static int createUserCard(CardChannel channel, String info, int userPassword, CardTerminal terminal, Card card) {
+    public static int createUserCard(CardChannel channel, String info1, String info2, int userPassword, CardTerminal terminal, Card card) {
         System.out.println("Create user card from blank smartcard");
 
         System.out.println("      Authenticating as default CSC0 user");
@@ -207,11 +306,13 @@ public class smartcardApi {
             return -10;
         }
 
-        System.out.println("      Writing user info in User1");
-        if (info.length() < 64) {
+        System.out.println("      Writing user info1, info2 in User1, User2");
+        if (info1.length() < 64 && info2.length() < 64) {
             try {
-                updateUserData(channel, 1, info);
-                System.out.println("      Writing info success");
+                updateUserData(channel, 1, info1);
+                System.out.println("      Writing info1 success");
+                updateUserData(channel, 2, info2);
+                System.out.println("      Writing info2 success");
             } catch (InvalidLcValueException | UnknownException | InvalidP2ParameterException | MemoryErrorException | SecurityNotSatisfiedException | InvalidInstructionByteException e) {
                 System.out.println("      Error : failed to write user info");
                 e.printStackTrace();
@@ -222,10 +323,12 @@ public class smartcardApi {
             return -12;
         }
 
-        System.out.println("      Updating user password");
+        System.out.println("      Updating user1, user2 password");
         try {
             writeCSC(channel, 1, userPassword);
-            System.out.println("      Updating user password success");
+            System.out.println("      Updating user1 password success");
+            writeCSC(channel, 2, userPassword);
+            System.out.println("      Updating user2 password success");
         } catch (InvalidNumberOfDigitsException | InvalidCSCIdException | InvalidLcValueException | InvalidP2ParameterException | InvalidInstructionByteException | MemoryErrorException | SecurityNotSatisfiedException | UnknownException e) {
             System.out.println("      Error : failed to update user password");
             e.printStackTrace();
@@ -255,6 +358,19 @@ public class smartcardApi {
         return 0;
     }
 
+    /***
+     *
+     * @param channel
+     * @param p2
+     * @param le
+     * @return
+     * @throws UnknownModeException
+     * @throws InvalidLenghtOfExpectedDataException
+     * @throws SecurityNotSatisfiedException
+     * @throws InvalidP2ParameterException
+     * @throws InvalidInstructionByteException
+     * @throws UnknownException
+     */
     private static byte[] read(CardChannel channel, int p2, int le) throws UnknownModeException, InvalidLenghtOfExpectedDataException, SecurityNotSatisfiedException, InvalidP2ParameterException, InvalidInstructionByteException, UnknownException {
         CommandAPDU command = new CommandAPDU(0x80, 0xBE, 0x00, p2, le);
         ResponseAPDU r;
@@ -281,6 +397,20 @@ public class smartcardApi {
         }
     }
 
+    /***
+     *
+     * @param channel
+     * @param p2
+     * @param lc
+     * @param data
+     * @return
+     * @throws MemoryErrorException
+     * @throws InvalidLcValueException
+     * @throws SecurityNotSatisfiedException
+     * @throws InvalidP2ParameterException
+     * @throws InvalidInstructionByteException
+     * @throws UnknownException
+     */
     private static int update(CardChannel channel, int p2, int lc, byte[] data) throws MemoryErrorException, InvalidLcValueException, SecurityNotSatisfiedException, InvalidP2ParameterException, InvalidInstructionByteException, UnknownException {
         CommandAPDU command = new CommandAPDU(0x80, 0xDE, 0x00, p2, data, lc);
         ResponseAPDU r;
@@ -305,6 +435,20 @@ public class smartcardApi {
         }
     }
 
+    /***
+     *
+     * @param channel
+     * @param p2
+     * @param data
+     * @return
+     * @throws InvalidSecretCodeException
+     * @throws UnknownModeException
+     * @throws InvalidLcValueException
+     * @throws MaxPresentationExceededException
+     * @throws InvalidP2ParameterException
+     * @throws InvalidInstructionByteException
+     * @throws UnknownException
+     */
     private static int verify(CardChannel channel, int p2, byte[] data) throws InvalidSecretCodeException, UnknownModeException, InvalidLcValueException, MaxPresentationExceededException, InvalidP2ParameterException, InvalidInstructionByteException, UnknownException {
         CommandAPDU command = new CommandAPDU(0x00, 0x20, 0x00, p2, data);
         ResponseAPDU r;
@@ -330,6 +474,11 @@ public class smartcardApi {
         }
     }
 
+    /***
+     *
+     * @param args
+     * @throws CardException
+     */
     public static void main(String[] args) throws CardException {
         List<CardTerminal> terminauxDispos = smartcardApi.getTerminals();
         CardTerminal terminal = terminauxDispos.get(0);
