@@ -27,4 +27,9 @@ public class Point {
     public void printPoint() {
         System.out.println("[Point] : Point(" + this.x + "," + this.y + ")");
     }
+
+    @Override
+    public String toString() {
+        return "Point{" + "x=" + x + ", y=" + y + '}';
+    }
 }

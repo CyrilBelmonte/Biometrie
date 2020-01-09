@@ -26,4 +26,9 @@ public class AngleRTable {
     public void setPoint(Point point) {
         this.point = point;
     }
+
+    @Override
+    public String toString() {
+        return "AngleRTable{" + "angle=" + angle + ", point=" + point.toString() + '}';
+    }
 }

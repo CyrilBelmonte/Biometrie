@@ -2,10 +2,8 @@ package ihm.utils.hough;
 
 import ihm.utils.Point;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class RTable {
@@ -23,6 +21,10 @@ public class RTable {
         } else {
             this.rTable.get(theta).add(point);
         }
+    }
+
+    public void remove(Integer integer) {
+        this.rTable.remove(integer);
     }
 
     public HashMap<Integer, ArrayList<Point>> getRTable() {
@@ -43,8 +45,33 @@ public class RTable {
                     }
                 }
             }
-
         }
         return cleanUp;
     }
+
+    @Override
+    public String toString() {
+
+        String tmp = "";
+
+        for (Map.Entry<Integer, ArrayList<Point>> entry : this.rTable.entrySet()) {
+            tmp = tmp = " Key " + entry.getKey() + " :  \n";
+            for (Point point : entry.getValue()) {
+                tmp = tmp = " Point " + point.toString() + "\n";
+            }
+            tmp = tmp + "\n";
+        }
+        return tmp;
+    }
+
+    public void toPrint(HashMap<Integer, ArrayList<Point>> rTable) {
+
+        String tmp = "";
+
+        for (Map.Entry<Integer, ArrayList<Point>> entry : rTable.entrySet()) {
+            System.out.println("Key : " + entry.getKey() + " Size =" + entry.getValue().size());
+        }
+    }
 }
+
+

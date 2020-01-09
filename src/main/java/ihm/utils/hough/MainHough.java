@@ -1,9 +1,10 @@
 package ihm.utils.hough;
 
 import ihm.utils.Point;
-import ihm.utils.filter.Prewitt;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainHough {
 
@@ -27,8 +28,27 @@ public class MainHough {
         point.printPoint();
         */
 
-        System.out.println(/********************************************************/);
+        System.out.println("/********************************************************/");
 
-        hough.accImg(hough.accTable("src\\resources\\Hough\\Prewitt.png", hough.getRTable("src\\resources\\Hough\\Prewitt.png")));
+        String model = "src\\resources\\Hough\\Cercle.png";
+        String img = "src\\resources\\Hough\\Cercle.png";
+        String tmp = "src\\resources\\tmp\\Prewitt.png";
+        Point center = hough.getBarycentre(model);
+
+        System.out.println(center.toString());
+
+        HashMap<Integer, ArrayList<Point>> rtable = hough.getRTable(model);
+
+        int[][] acc = hough.accTable(model, rtable);
+
+        hough.accImg(acc);
+
+        System.out.println(hough.findMax(acc).toString());
+
+        //Point center = new Point(0, 0);
+        //Point point = new Point(1, 1);
+
+        //System.out.println(hough.getAngleDistance(center, point).toString());
+
     }
 }
