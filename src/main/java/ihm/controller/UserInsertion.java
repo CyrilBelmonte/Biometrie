@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import server.tools.AES;
 import server.tools.Tools;
 import smartcard.smartcardApi;
 
@@ -128,7 +129,7 @@ public class UserInsertion {
             return;
         }
 
-        if (authPinField.getLength() != 6) {
+        if (userPinField.getLength() != 6) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Incorrect PIN code");
             alert.setHeaderText(null);
@@ -148,6 +149,8 @@ public class UserInsertion {
         int y = Tools.getSeed();
 
         String userPinHash = Tools.hmacMD5(Tools.hmacMD5(userPinCode, String.valueOf(x)), String.valueOf(y));
+        String biometryAESKey = AES.generateKey(128);
+        String biometryData = AES.encrypt(biometryPath, biometryAESKey);
 
         // Opening the socket
         try {
@@ -163,8 +166,10 @@ public class UserInsertion {
         }
 
         // Creating the user
+        String userID;
+
         try {
-            send("CREATE;" + firstName + "," + lastName + "," + email + "," + isAdmin + "," + x + "," + y + "," + userPinHash + "," + biometryPath + ";" + sessionKey);
+            send("CREATE;" + firstName + "," + lastName + "," + email + "," + isAdmin + "," + x + "," + y + "," + userPinHash + "," + biometryData + ";" + sessionKey);
             String[] reply = receiveAndPrepare(1024);
             close();
 
@@ -178,6 +183,8 @@ public class UserInsertion {
                 throw new Exception("Error: " + reply[2]);
             }
 
+            userID = reply[2];
+
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Connection");
@@ -188,7 +195,8 @@ public class UserInsertion {
         }
 
         // Flashing the card
-        // [...]
+        CardChannel channel = card.getBasicChannel();
+        smartcardApi.createUserCard(channel, userID + ";" + firstName + " " + lastName, biometryAESKey, Integer.valueOf(userPinCode), terminal, card);
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Operation successful");
@@ -213,7 +221,6 @@ public class UserInsertion {
         String enteredPinCode = authPinField.getText();
 
         CardChannel channel = card.getBasicChannel();
-        // TODO: RETRIEVE REMAINING ATTEMPS
         int remainingAttemps = 3;
 
         if (remainingAttemps > 0) {
@@ -246,19 +253,15 @@ public class UserInsertion {
             return;
         }
 
-        // ---- RECUPERATION ID ET UTILISATEUR ----
-        int id = 0;
-        String userFullName = "";
+        // Retrieve the id and username from the card
+        int id;
+        String userFullName;
 
         try {
             String data = smartcardApi.readUserData(channel, 1);
-            System.out.println(data);
             String[] dataParts = data.split(";");
             id = Integer.valueOf(dataParts[0]);
             userFullName = dataParts[1];
-            System.out.println(id);
-            System.out.println(userFullName);
-            System.exit(0);
 
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -436,7 +439,7 @@ public class UserInsertion {
                                 authPanel2.setDisable(true);
                                 authPinField.clear();
 
-                                authCardLabel.setText("Waiting for the user card...");
+                                userCardLabel.setText("Waiting for the user card...");
                                 userCardImage.setVisible(false);
                                 userCardProgress.setVisible(true);
                             }

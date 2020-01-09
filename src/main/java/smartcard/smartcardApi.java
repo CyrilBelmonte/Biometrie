@@ -287,7 +287,8 @@ public class smartcardApi {
      * Returns -15 if failed to reset card.
      *
      * @param channel
-     * @param info
+     * @param info1
+     * @param info2
      * @return
      */
     public static int createUserCard(CardChannel channel, String info1, String info2, int userPassword, CardTerminal terminal, Card card) {
@@ -335,7 +336,7 @@ public class smartcardApi {
             return -13;
         }
 
-        System.out.println("      Applying user mode");
+        /*System.out.println("      Applying user mode");
         try {
             applyUserMode(channel);
             System.out.println("      Applying user mode success");
@@ -353,7 +354,7 @@ public class smartcardApi {
             System.out.println("      Error : failed to reset card");
             e.printStackTrace();
             return -15;
-        }
+        }*/
         System.out.println("      Successfully went through user card creation sequence");
         return 0;
     }
