@@ -162,10 +162,14 @@ public class ClientHandler extends Thread {
                     throw new Exception("Bad request");
                 }
 
+                Tools.printLogMessage(String.valueOf(clientID), " | Check if the user has administration privileges...");
+
                 if (user.isAdmin()) {
+                    Tools.printLogMessage(String.valueOf(clientID), " | " + user.getFirstName() + " " + user.getLastName() + " is administrator!");
                     send("REPLY;OK;true");
 
                 } else {
+                    Tools.printLogMessage(String.valueOf(clientID), " | " + user.getFirstName() + " " + user.getLastName() + " is a standard user");
                     send("REPLY;OK;false");
                 }
 

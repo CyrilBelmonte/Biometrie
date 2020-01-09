@@ -11,8 +11,6 @@ import java.io.IOException;
 public class MainInscription extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-
-
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/fxml/UserInsertion.fxml"));
 
@@ -26,6 +24,7 @@ public class MainInscription extends Application {
     }
 
     public static void main(String[] args) {
+        nu.pattern.OpenCV.loadShared();
         launch(args);
     }
 }

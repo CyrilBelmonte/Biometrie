@@ -188,6 +188,8 @@ public class UserInsertion {
                 throw new Exception("The reply is incorrect.");
 
             } else if (reply[1].equals("ERROR") && reply[2].equals("UNKNOWN_SESSION")) {
+                userTab.setDisable(true);
+                tabPane.getSelectionModel().select(authTab);
                 throw new Exception("The session key has expired:\n" + sessionKey);
 
             } else if (reply[1].equals("ERROR")) {
@@ -365,6 +367,7 @@ public class UserInsertion {
             alert.setContentText("You are connected!\nThe session will automatically expire after 5 minutes of inactivity.");
             alert.showAndWait();
 
+            authPinField.clear();
             userTab.setDisable(false);
             tabPane.getSelectionModel().select(userTab);
 
