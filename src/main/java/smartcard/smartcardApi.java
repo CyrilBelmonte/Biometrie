@@ -310,9 +310,13 @@ public class smartcardApi {
         if (info1.length() < 64 && info2.length() < 64) {
             try {
                 resetUserData(channel, 1);
+                System.out.println("            Info 1 : "+info1);
+                System.out.println("            Length info 1 : "+info1.length());
                 updateUserData(channel, 1, info1);
                 System.out.println("      Writing info1 success");
                 resetUserData(channel, 2);
+                System.out.println("            Info 2 : "+info1);
+                System.out.println("            Length info 2 : "+info1.length());
                 updateUserData(channel, 2, info2);
                 System.out.println("      Writing info2 success");
             } catch (InvalidLcValueException | UnknownException | InvalidP2ParameterException | MemoryErrorException | SecurityNotSatisfiedException | InvalidInstructionByteException e) {
