@@ -1,27 +1,11 @@
 #!/usr/bin/env python
-
-__author__ = "Adeel Ahmad"
-__email__ = "adeelahmad14@hotmail.com"
-__status__ = "Production"
-
 import numpy as np
-from scipy.ndimage import convolve
 from build_reference_table import *
-from skimage import io
-import matplotlib.pyplot as plt
 
 
 def matchTable(im, table):
-    """
-    :param im: input binary image, for searching template
-    :param table: table for template
-    :return:
-        accumulator with searched votes
-    """
-    # matches the reference table with the given input
-    # image for testing generalized Hough Transform
     m, n = im.shape[:-1]
-    acc = np.zeros((m + 150, n + 150))  # acc array requires some extra space
+    acc = np.zeros((m, n))
 
     def findGradient(x, y):
         if (x != 0):
@@ -29,9 +13,9 @@ def matchTable(im, table):
         else:
             return 0
 
-    for x in range(1, im.shape[0]):
-        for y in range(im.shape[1]):
-            if im[x, y].all() != 0:  # boundary point
+    for x in range(100, im.shape[0] - 200):
+        for y in range(20, im.shape[1] - 20):
+            if im[x, y].all() != 0:
                 theta = findGradient(x, y)
                 vectors = table[theta]
                 for vector in vectors:

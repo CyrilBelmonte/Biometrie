@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
 import numpy as np
-from scipy.ndimage import convolve
-from skimage import io
-import matplotlib.pyplot as plt
 
 
 def buildRefTable(img):
