@@ -467,8 +467,7 @@ public class smartcardApi {
             r = channel.transmit(command);
             int SW1 = r.getSW1();
             if (SW1 == 144) {
-                System.out.println("                  Successfully read data bytes at " + p2 + " with lenght " + le + " :");
-                System.out.println("                  " + toString(r.getData()));
+                System.out.println("                  Successfully read data bytes at 0x" + Integer.toHexString(p2) + " with lenght 0x" + Integer.toHexString(le) + " (" +le +" :");                System.out.println("                  " + toString(r.getData()));
                 System.out.println("                  String value of retrieved bytes is :");
                 System.out.println("                  " + new String(r.getData()));
                 return r.getData();
@@ -508,6 +507,9 @@ public class smartcardApi {
             r = channel.transmit(command);
             int SW1 = r.getSW1();
             if (SW1 == 144) {
+                System.out.println("                  Successfully updated memory from starting address 0x"+Integer.toHexString(p2));
+                System.out.println("                  From string : " + new String(data));
+                System.out.println("                  With bytes  : " + toString(data) +"\n");
                 return 0;
             } else if (SW1 == 101) throw new MemoryErrorException("Error : Encoutered a memory error");
             else if (SW1 == 103) throw new InvalidLcValueException("Error : Invalid Lc value");
