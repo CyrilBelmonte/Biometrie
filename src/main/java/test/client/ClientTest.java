@@ -12,81 +12,97 @@ import java.nio.charset.StandardCharsets;
 
 
 public class ClientTest {
-    private static String remoteHost = "127.0.0.1";
-    private static int remotePort = 4000;
+    private static final String REMOTE_HOST = "127.0.0.1";
+    private static final int REMOTE_PORT = 4000;
+    private static final String KEYSTORE_LOCATION = "C:/client_keystore.jks";
+    private static final String KEYSTORE_PASSWORD = "password";
 
-    public static void main(String[] args) throws IOException {
-        System.setProperty("javax.net.ssl.keyStore", "C:/client_keystore.jks");
-        System.setProperty("javax.net.ssl.keyStorePassword", "password");
+    private static SSLSocket socket;
+    private static BufferedInputStream inputStream;
+    private static BufferedOutputStream outputStream;
 
-        // AUTHENTICATION
-        SSLSocket socket = createSocket(remoteHost, remotePort);
-        BufferedInputStream inputStream = new BufferedInputStream(socket.getInputStream());
-        BufferedOutputStream outputStream = new BufferedOutputStream(socket.getOutputStream());
+    public static void main(String[] args) throws Exception {
+        String sessionKey;
+        String[] reply;
 
-        send("AUTHENTICATION;1;100002", outputStream);
-        String[] reply = receive(1024, inputStream).split(";");
+        // Authentication
+        openSocket();
+        send("AUTHENTICATION;1;100002");
+        reply = receiveAndPrepare(1024);
         String[] codes = reply[2].split(",");
-        send("AUTHENTICATION;2;" + Tools.hmacMD5(Tools.hmacMD5(Tools.hmacMD5("password", codes[0]), codes[1]), codes[2]), outputStream);
-        String biometricData = receive(1024, inputStream);
-        send("AUTHENTICATION;3;CREATE_SESSION", outputStream);
-        String[] reply2 = receive(1024, inputStream).split(";");
-        String sessionKey = reply2[2];
+        send("AUTHENTICATION;2;" + Tools.hmacMD5(Tools.hmacMD5(Tools.hmacMD5("123456", codes[0]), codes[1]), codes[2]));
+        String[] biometricData = receiveAndPrepare(4096);
+        send("AUTHENTICATION;3;CREATE_SESSION"); // send("AUTHENTICATION;3;TERMINATE");
+        reply = receiveAndPrepare(1024);
+        sessionKey = reply[2];
         System.out.println("Session key: " + sessionKey);
+        close();
 
-        inputStream.close();
-        outputStream.close();
-        socket.close();
+        // GET
+        openSocket();
+        //sessionKey = "dcdd9808-7e87-4f3e-ac1d-4abb92157f8e";
+        send("GET;IS_ADMIN;" + sessionKey);
+        reply = receiveAndPrepare(1024);
+        System.out.println("Is admin ? " + reply[2]);
+        close();
 
-        // GET TEST
-        socket = createSocket(remoteHost, remotePort);
-        inputStream = new BufferedInputStream(socket.getInputStream());
-        outputStream = new BufferedOutputStream(socket.getOutputStream());
+        // CREATE
+        openSocket();
+        //sessionKey = "dcdd9808-7e87-4f3e-ac1d-4abb92157f8e";
+        send("CREATE;Tom,DOE,tom.doe@cergy.fr,false,1,2,7a7fd7808e663cbf88bded12a5098c14,ZRoRIAaTUcATXwc7oqlTUQ==;" + sessionKey);
+        reply = receiveAndPrepare(1024);
+        close();
 
-        send("GET;IS_ADMIN;" + sessionKey, outputStream);
-        String reply3 = receive(1024, inputStream);
-        System.out.println(reply3);
-
-        inputStream.close();
-        outputStream.close();
-        socket.close();
-
-        // INSERT TEST
-        socket = createSocket(remoteHost, remotePort);
-        inputStream = new BufferedInputStream(socket.getInputStream());
-        outputStream = new BufferedOutputStream(socket.getOutputStream());
-
-        send("CREATE;Tom,DOE,tom.doe@cergy.fr,false,1,2,7a7fd7808e663cbf88bded12a5098c14,ZRoRIAaTUcATXwc7oqlTUQ==;" + sessionKey, outputStream);
-        String reply4 = receive(1024, inputStream);
-        System.out.println(reply4);
-
-        inputStream.close();
-        outputStream.close();
-        socket.close();
+        // DELETE
+        openSocket();
+        //sessionKey = "dcdd9808-7e87-4f3e-ac1d-4abb92157f8e";
+        send("DELETE;SESSION;" + sessionKey);
+        reply = receiveAndPrepare(1024);
+        close();
     }
 
-    private static void send(String message, BufferedOutputStream outputStream) throws IOException {
+    private static void openSocket() throws IOException {
+        System.setProperty("javax.net.ssl.keyStore", KEYSTORE_LOCATION);
+        System.setProperty("javax.net.ssl.keyStorePassword", KEYSTORE_PASSWORD);
+
+        SocketFactory socketFactory = SSLSocketFactory.getDefault();
+        socket = (SSLSocket) socketFactory.createSocket(REMOTE_HOST, REMOTE_PORT);
+        socket.startHandshake();
+
+        inputStream = new BufferedInputStream(socket.getInputStream());
+        outputStream = new BufferedOutputStream(socket.getOutputStream());
+    }
+
+    private static void send(String message) throws IOException {
+        Tools.printLogMessageErr("<-----", "Payload: " + message.replace(";", " "));
         byte[] buffer = message.getBytes(StandardCharsets.UTF_8);
         outputStream.write(buffer, 0, buffer.length);
         outputStream.flush();
     }
 
-    private static String receive(int bufferSize, BufferedInputStream inputStream) throws IOException {
+    private static String receive(int bufferSize) throws Exception {
         byte[] buffer = new byte[bufferSize];
         int messageSize = inputStream.read(buffer, 0, bufferSize);
 
         if (messageSize <= 0) {
-            throw new IOException("No data received!");
+            throw new Exception("Socket closed before finishing the process");
         }
 
         return new String(buffer, StandardCharsets.UTF_8).trim();
     }
 
-    public static SSLSocket createSocket(String remoteHost, int remotePort) throws IOException {
-        SocketFactory socketFactory = SSLSocketFactory.getDefault();
-        SSLSocket socket = (SSLSocket) socketFactory.createSocket(remoteHost, remotePort);
-        socket.startHandshake();
+    private static String[] receiveAndPrepare(int bufferSize) throws Exception {
+        String[] reply = receive(bufferSize).split(";");
+        Tools.printLogMessageErr("----->", "Payload: " + String.join(" ", reply));
+        return reply;
+    }
 
-        return socket;
+    private static void close() {
+        try {
+            inputStream.close();
+            outputStream.close();
+            socket.close();
+
+        } catch (Exception e) {}
     }
 }

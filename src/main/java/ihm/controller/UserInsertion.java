@@ -199,24 +199,23 @@ public class UserInsertion {
 
             userID = reply[2];
 
+            // Flashing the card
+            CardChannel channel = card.getBasicChannel();
+            smartcardApi.createUserCard(channel, userID + ";" + firstName + " " + lastName, biometryAESKey, Integer.valueOf(userPinCode), terminal, card);
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Operation successful");
+            alert.setHeaderText(null);
+            alert.setContentText("The user has been created and the card is ready!");
+            alert.showAndWait();
+
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Connection");
             alert.setHeaderText(null);
             alert.setContentText(e.getMessage());
             alert.showAndWait();
-            return;
         }
-
-        // Flashing the card
-        CardChannel channel = card.getBasicChannel();
-        smartcardApi.createUserCard(channel, userID + ";" + firstName + " " + lastName, biometryAESKey, Integer.valueOf(userPinCode), terminal, card);
-
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Operation successful");
-        alert.setHeaderText(null);
-        alert.setContentText("The user has been created and the card is ready!");
-        alert.showAndWait();
     }
 
     @FXML
@@ -418,11 +417,11 @@ public class UserInsertion {
                             isCardInserted = terminal.isCardPresent();
 
                             if (isCardInserted) {
-                                Tools.printLogMessage("ihm_au", "A card has been inserted...");
+                                Tools.printLogMessage("ihm_in", "A card has been inserted...");
                                 card = terminal.connect("T=0");
 
                             } else {
-                                Tools.printLogMessage("ihm_au", "A card has been removed...");
+                                Tools.printLogMessage("ihm_in", "A card has been removed...");
                                 card = null;
                             }
 
