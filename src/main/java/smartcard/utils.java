@@ -51,4 +51,13 @@ public class utils {
         }
         return data;
     }
+
+    public static String formatStringToAllocationShape(String str) {
+        if(str.length() % 4 != 0) str += ";";
+        while (str.length() % 4 != 0) {
+
+            str += " ";
+        }
+        return str;
+    }
 }

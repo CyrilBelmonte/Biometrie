@@ -309,6 +309,8 @@ public class smartcardApi {
         System.out.println("      Writing user info1, info2 in User1, User2");
         if (info1.length() < 64 && info2.length() < 64) {
             try {
+                info1 = utils.formatStringToAllocationShape(info1);
+                info2 = utils.formatStringToAllocationShape(info2);
                 resetUserData(channel, 1);
                 System.out.println("            Info 1 : "+info1);
                 System.out.println("            Length info 1 : "+info1.length());
