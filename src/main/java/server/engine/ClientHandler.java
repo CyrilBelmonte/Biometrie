@@ -129,6 +129,7 @@ public class ClientHandler extends Thread {
 
                 } else if (request[2].equals("TERMINATE")) {
                     Tools.printLogMessage(String.valueOf(clientID), " | No session will be generated");
+                    send("REPLY;OK;NULL");
 
                 } else {
                     send("REPLY;BAD_REQUEST;UNKNOWN_COMMAND");

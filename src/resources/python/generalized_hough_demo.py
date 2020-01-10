@@ -38,7 +38,7 @@ def point(model, image):
     plt.figure(1)
     imshow(acc)
     plt.show()
-    plt.savefig('./generate/Acc.png')
+    plt.savefig('./src/resources/python/generate/Acc.png')
 
     # code for drawing bounding-box in original image at the found location...
 
@@ -61,17 +61,17 @@ def point(model, image):
 
     # show the image
     plt.figure(2), imshow(refim)
-    plt.savefig('./generate/Modele.png')
+    plt.savefig('./src/resources/python/generate/Modele.png')
     plt.figure(3), imshow(im)
-    plt.savefig('./generate/Images.png')
+    plt.savefig('./src/resources/python/generate/Images.png')
     plt.show()
-    plt.savefig('./generate/details_hough.png')
+    plt.savefig('./src/resources/python/generate/details_hough.png')
     return ridx, cidx
 
 
 def imageLocal(ridx, cidx):
     # Download Image:
-    im = Image.open("Modele/pictures.png")
+    im = Image.open("./src/resources/python/Modele/pictures.png")
     # Check Image Size
     im_size = im.size
     # Define box inside image
@@ -84,7 +84,7 @@ def imageLocal(ridx, cidx):
     # Crop Image
     area = im.crop(box)
     # Save Image
-    area.save("./generate/localImage.png")
+    area.save("./src/resources/python/generate/localImage.png")
 
 
 def histogram(image):
@@ -93,11 +93,11 @@ def histogram(image):
 
 
 image = sys.argv[1]
-
-model = './Modele/Cercle.png'
+model = './src/resources/python/Modele/Cercle.png'
 
 ridx, cidx = point(model, image)
+print("Test")
 
 imageLocal(ridx, cidx)
-
-print(histogram('./generate/localImage.png'))
+print("Test")
+print(histogram('./src/resources/python/generate/localImage.png'))
