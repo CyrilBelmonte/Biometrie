@@ -284,6 +284,7 @@ public class smartcardApi {
      * Retunrs -13 if failed to update user password.
      * Returns -14 if failed to switch to user mode.
      * Returns -15 if failed to reset card.
+     * Returns -16 if failed to secure CSC0 secret code
      *
      * @param channel
      * @param info1
@@ -334,13 +335,23 @@ public class smartcardApi {
         System.out.println("      Updating user1, user2 password");
         try {
             writeCSC(channel, 1, userPassword);
-            System.out.println("      Updating user1 password success");
+            System.out.println("      Updating CSC1 password success");
             writeCSC(channel, 2, userPassword);
-            System.out.println("      Updating user2 password success");
+            System.out.println("      Updating CSC2 password success");
         } catch (InvalidNumberOfDigitsException | InvalidCSCIdException | InvalidLcValueException | InvalidP2ParameterException | InvalidInstructionByteException | MemoryErrorException | SecurityNotSatisfiedException | UnknownException e) {
             System.out.println("      Error : failed to update user password");
             e.printStackTrace();
             return -13;
+        }
+
+        System.out.println("      Overwriting CSC0 password from factory to company secured");
+        try{
+            writeCSC(channel, 0, 123456);
+            System.out.println("      Overwriting CSC0 password success");
+        } catch (InvalidInstructionByteException | SecurityNotSatisfiedException | MemoryErrorException | InvalidCSCIdException | InvalidLcValueException | UnknownException | InvalidP2ParameterException | InvalidNumberOfDigitsException e) {
+            System.out.println("      Error : failed to update CSCO password");
+            e.printStackTrace();
+            return -16;
         }
 
         /*System.out.println("      Applying user mode");
@@ -374,6 +385,7 @@ public class smartcardApi {
      * Retunrs -13 if failed to update user password.
      * Returns -14 if failed to switch to user mode.
      * Returns -15 if failed to reset card.
+     * Returns -16 if failed to secure CSC0 secret code
      *
      * @param channel
      * @param info1
@@ -399,13 +411,30 @@ public class smartcardApi {
             return -10;
         }
 
+        System.out.println("      Overwriting CSC0 password from factory to company secured");
+        try{
+            writeCSC(channel, 0, 123456);
+            authCSC(channel, 0, 123456);
+            System.out.println("      Overwriting CSC0 password success");
+        } catch (InvalidInstructionByteException | SecurityNotSatisfiedException | MemoryErrorException | InvalidCSCIdException | InvalidLcValueException | UnknownException | InvalidP2ParameterException | InvalidNumberOfDigitsException | InvalidSecretCodeException | UnknownModeException | MaxPresentationExceededException e) {
+            System.out.println("      Error : failed to update CSCO password");
+            e.printStackTrace();
+            return -16;
+        }
+
         System.out.println("      Writing user info1, info2 in User1, User2");
         if (info1.length() < 64 && info2.length() < 64) {
             try {
+                info1 = utils.formatStringToAllocationShape(info1);
+                info2 = utils.formatStringToAllocationShape(info2);
                 resetUserData(channel, 1);
+                System.out.println("            Info 1 : "+info1);
+                System.out.println("            Length info 1 : "+info1.length());
                 updateUserData(channel, 1, info1);
                 System.out.println("      Writing info1 success");
                 resetUserData(channel, 2);
+                System.out.println("            Info 2 : "+info1);
+                System.out.println("            Length info 2 : "+info1.length());
                 updateUserData(channel, 2, info2);
                 System.out.println("      Writing info2 success");
             } catch (InvalidLcValueException | UnknownException | InvalidP2ParameterException | MemoryErrorException | SecurityNotSatisfiedException | InvalidInstructionByteException e) {
