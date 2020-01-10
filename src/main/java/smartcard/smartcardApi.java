@@ -183,7 +183,7 @@ public class smartcardApi {
         System.out.println(toString(readResult));
         String userData = new String(readResult);
         // To print the text from the retrieved bytes.
-        System.out.println("            Read data from User" +Integer.toString(userId) +" : " + userData);
+        System.out.println("            Read data from User" + Integer.toString(userId) + " : " + userData);
         userData.replace(" ", "");
         return userData;
     }
@@ -210,7 +210,7 @@ public class smartcardApi {
 
         byte[] b = data.getBytes();
         int writeResult = update(channel, p2, 0x04, b);
-        System.out.println("            Updated for User" +userId +" with data : " +data);
+        System.out.println("            Updated for User" + userId + " with data : " + data);
         return writeResult;
     }
 
@@ -236,7 +236,7 @@ public class smartcardApi {
         byte[] b = new byte[64];
 
         int writeResult = update(channel, p2, 0x04, b);
-        System.out.println("            Reseted data for User" +userId);
+        System.out.println("            Reseted data for User" + userId);
         return writeResult;
     }
 
@@ -309,10 +309,10 @@ public class smartcardApi {
         System.out.println("      Writing user info1, info2 in User1, User2");
         if (info1.length() < 64 && info2.length() < 64) {
             try {
-                resetUserData(channel,1);
+                resetUserData(channel, 1);
                 updateUserData(channel, 1, info1);
                 System.out.println("      Writing info1 success");
-                resetUserData(channel,2);
+                resetUserData(channel, 2);
                 updateUserData(channel, 2, info2);
                 System.out.println("      Writing info2 success");
             } catch (InvalidLcValueException | UnknownException | InvalidP2ParameterException | MemoryErrorException | SecurityNotSatisfiedException | InvalidInstructionByteException e) {
@@ -360,6 +360,23 @@ public class smartcardApi {
         return 0;
     }
 
+    /***
+     *
+     * Returns -10 if failed to authenticate.
+     * Returns -11 if failed to update user info.
+     * Returns -12 if provided infos are too long.
+     * Retunrs -13 if failed to update user password.
+     * Returns -14 if failed to switch to user mode.
+     * Returns -15 if failed to reset card.
+     *
+     * @param channel
+     * @param info1
+     * @param info2
+     * @param userPassword
+     * @param terminal
+     * @param card
+     * @return
+     */
     public static int createUserCardFull(CardChannel channel, String info1, String info2, int userPassword, CardTerminal terminal, Card card) {
         System.out.println("Create user card from blank smartcard");
 
@@ -379,10 +396,10 @@ public class smartcardApi {
         System.out.println("      Writing user info1, info2 in User1, User2");
         if (info1.length() < 64 && info2.length() < 64) {
             try {
-                resetUserData(channel,1);
+                resetUserData(channel, 1);
                 updateUserData(channel, 1, info1);
                 System.out.println("      Writing info1 success");
-                resetUserData(channel,2);
+                resetUserData(channel, 2);
                 updateUserData(channel, 2, info2);
                 System.out.println("      Writing info2 success");
             } catch (InvalidLcValueException | UnknownException | InvalidP2ParameterException | MemoryErrorException | SecurityNotSatisfiedException | InvalidInstructionByteException e) {
@@ -450,6 +467,10 @@ public class smartcardApi {
             r = channel.transmit(command);
             int SW1 = r.getSW1();
             if (SW1 == 144) {
+                System.out.println("                  Successfully read data bytes at " + p2 + " with lenght " + le + " :");
+                System.out.println("                  " + toString(r.getData()));
+                System.out.println("                  String value of retrieved bytes is :");
+                System.out.println("                  " + new String(r.getData()));
                 return r.getData();
             } else if (SW1 == 101) throw new UnknownModeException("Error : Encoutered a memory error");
             else if (SW1 == 103)
