@@ -367,6 +367,12 @@ public class UserInsertion {
             alert.setContentText("You are connected!\nThe session will automatically expire after 5 minutes of inactivity.");
             alert.showAndWait();
 
+            alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Information");
+            alert.setHeaderText(null);
+            alert.setContentText("Remove your personal card from the terminal and insert the user card you want to flash.");
+            alert.showAndWait();
+
             authPinField.clear();
             userTab.setDisable(false);
             tabPane.getSelectionModel().select(userTab);
