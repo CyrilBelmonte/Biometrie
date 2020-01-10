@@ -9,13 +9,10 @@ import javafx.stage.StageStyle;
 
 import java.io.IOException;
 
+
 public class MainApp extends Application {
-
-
     @Override
     public void start(Stage stage) throws IOException {
-
-
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/fxml/InsertSmartCard.fxml"));
 

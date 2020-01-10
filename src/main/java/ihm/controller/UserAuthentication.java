@@ -61,6 +61,7 @@ public class UserAuthentication {
     private String sessionKey = null;
     private String biometryData = null;
     private boolean isCardInserted = false;
+    private int remainingAttemps = 3;
     private CardTerminal terminal;
     private Card card;
 
@@ -119,6 +120,8 @@ public class UserAuthentication {
 
     @FXML
     void captureButtonHandler(ActionEvent event) {
+        Tools.printLogMessage("ihm_au", "captureButtonHandler called...");
+
         saveToFile(image);
 
         String fileIn = "src\\resources\\tmp\\pictures.png";
@@ -159,7 +162,7 @@ public class UserAuthentication {
 
         if (biometryOK) {
             stopAcquisition();
-
+            Tools.printLogMessage("ihm_au", "The user is recognized!");
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Connection");
             alert.setHeaderText(null);
@@ -167,6 +170,7 @@ public class UserAuthentication {
             alert.showAndWait();
 
         } else {
+            Tools.printLogMessageErr("ihm_au", "Unable to recognize the user");
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Connection");
             alert.setHeaderText(null);
@@ -176,22 +180,25 @@ public class UserAuthentication {
         }
 
         try {
+            Tools.printLogMessage("ihm_au", "Starting authentication phase 3...");
+            Tools.printLogMessage("ihm_au", "Sending a session request...");
             send("AUTHENTICATION;3;CREATE_SESSION");
-            String[] reply = receive(1024).split(";");
+            String[] reply = receiveAndPrepare(1024);
 
             if (reply.length != 3) {
-                throw new Exception("The reply is incorrect.");
+                throw new Exception("The reply is incorrect");
 
             } else if (reply[1].equals("ERROR")) {
                 throw new Exception("Error: " + reply[2]);
             }
 
             sessionKey = reply[2];
-            System.out.println("Session key: " + sessionKey);
-
+            Tools.printLogMessage("ihm_au", "Session key: " + sessionKey);
+            Tools.printLogMessage("ihm_au", "Authentication phase completed!");
             close();
 
         } catch (Exception e) {
+            Tools.printLogMessageErr("ihm_au", e.getMessage());
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Connection");
             alert.setHeaderText(null);
@@ -207,6 +214,9 @@ public class UserAuthentication {
 
     @FXML
     void loginButtonHandler(ActionEvent event) {
+        Tools.printLogMessage("ihm_au", "loginButtonHandler called...");
+        Tools.printLogMessage("ihm_au", "Checking the length of the password...");
+
         if (authPinField.getLength() != 6) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Incorrect PIN code");
@@ -216,16 +226,20 @@ public class UserAuthentication {
             return;
         }
 
+        Tools.printLogMessage("ihm_au", "Retrieving general card information...");
         String enteredPinCode = authPinField.getText();
-
         CardChannel channel = card.getBasicChannel();
-        int remainingAttemps = 3;
+        Tools.printLogMessage("ihm_au", "Remaining attemps: " + remainingAttemps);
 
         if (remainingAttemps > 0) {
             try {
+                Tools.printLogMessage("ihm_au", "Sending the PIN code to the card...");
                 smartcardApi.authCSC(channel, 1, Integer.valueOf(enteredPinCode));
+                remainingAttemps = 3;
+                Tools.printLogMessage("ihm_au", "Succeeded!");
 
             } catch (smartcardApi.InvalidSecretCodeException e) {
+                Tools.printLogMessageErr("ihm_au", "Incorrect PIN code: " + enteredPinCode);
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Incorrect PIN code");
                 alert.setHeaderText(null);
@@ -234,6 +248,7 @@ public class UserAuthentication {
                 return;
 
             } catch (Exception e) {
+                Tools.printLogMessageErr("ihm_au", e.getMessage());
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText(null);
@@ -243,6 +258,7 @@ public class UserAuthentication {
             }
 
         } else {
+            Tools.printLogMessageErr("ihm_au", "The card was blocked after 3 attempts...");
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Incorrect PIN code");
             alert.setHeaderText(null);
@@ -252,6 +268,7 @@ public class UserAuthentication {
         }
 
         // Retrieve the id and username from the card
+        Tools.printLogMessage("ihm_au", "Retrieving card information...");
         int id;
         String userFullName;
         String biometryKey;
@@ -265,7 +282,12 @@ public class UserAuthentication {
             smartcardApi.authCSC(channel, 2, Integer.valueOf(enteredPinCode));
             biometryKey = smartcardApi.readUserData(channel, 2);
 
+            Tools.printLogMessage("ihm_au", "User ID: " + id);
+            Tools.printLogMessage("ihm_au", "Username: " + userFullName);
+            Tools.printLogMessage("ihm_au", "Biometry AES key: " + biometryKey);
+
         } catch (Exception e) {
+            Tools.printLogMessageErr("ihm_au", e.getMessage());
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText(null);
@@ -275,9 +297,12 @@ public class UserAuthentication {
         }
 
         try {
+            Tools.printLogMessage("ihm_au", "Connecting to the server...");
             openSocket();
+            Tools.printLogMessage("ihm_au", "Succeeded!");
 
         } catch (IOException e) {
+            Tools.printLogMessageErr("ihm_au", "Unable to connect to the server");
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Connection");
             alert.setHeaderText(null);
@@ -287,14 +312,18 @@ public class UserAuthentication {
         }
 
         try {
+            Tools.printLogMessage("ihm_au", "Starting authentication phase 1...");
+            Tools.printLogMessage("ihm_au", "Sending the user ID: " + id);
             send("AUTHENTICATION;1;" + id);
+
+            Tools.printLogMessage("ihm_au", "Waiting for a reply...");
             String[] reply = receiveAndPrepare(1024);
 
             if (reply.length != 3) {
-                throw new Exception("The reply is incorrect.");
+                throw new Exception("The reply is incorrect");
 
             } else if (reply[1].equals("ERROR") && reply[2].equals("UNKNOWN_USER")) {
-                throw new Exception("The user doesn't exist.");
+                throw new Exception("The user doesn't exist");
 
             } else if (reply[1].equals("ERROR")) {
                 throw new Exception("Error: " + reply[2]);
@@ -304,31 +333,39 @@ public class UserAuthentication {
             String x = codes[0];
             String y = codes[1];
             String g = codes[2];
+            Tools.printLogMessage("ihm_au", "Received: X: " + x + ", Y: " + y + ", G: " + g);
+            Tools.printLogMessage("ihm_au", "Calculating Z...");
             String z = Tools.hmacMD5(Tools.hmacMD5(Tools.hmacMD5(enteredPinCode, x), y), g);
+            Tools.printLogMessage("ihm_au", "Z: " + z);
 
+            Tools.printLogMessage("ihm_au", "Starting authentication phase 2...");
+            Tools.printLogMessage("ihm_au", "Sending Z to the server: " + z);
             send("AUTHENTICATION;2;" + z);
 
             // Biometric data
+            Tools.printLogMessage("ihm_au", "Waiting for a reply...");
             reply = receiveAndPrepare(4096);
 
             if (reply.length != 3) {
-                throw new Exception("The reply is incorrect.");
+                throw new Exception("The reply is incorrect");
 
             } else if (reply[1].equals("ERROR") && reply[2].equals("PASSWORD_ERROR")) {
-                throw new Exception("The password is invalid.");
+                throw new Exception("The password is invalid");
 
             } else if (reply[1].equals("ERROR")) {
                 throw new Exception("Error: " + reply[2]);
             }
 
             String biometryDataAES = reply[2];
+            Tools.printLogMessage("ihm_au", "AES-encrypted biometry data received: " + biometryDataAES);
+            Tools.printLogMessage("ihm_au", "Decrypting with the AES key on the card: " + biometryKey);
             biometryData = AES.decrypt(biometryDataAES, biometryKey);
 
             if (biometryData == null) {
                 throw new Exception("The AES key stored in the card is invalid.");
             }
 
-            System.out.println("Biometry data: " + biometryData);
+            Tools.printLogMessage("ihm_au", "Decrypted data: " + biometryData);
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Connection");
@@ -340,6 +377,7 @@ public class UserAuthentication {
             tabPane.getSelectionModel().select(biometryAuthTab);
 
         } catch (Exception e) {
+            Tools.printLogMessageErr("ihm_au", e.getMessage());
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Connection");
             alert.setHeaderText(null);
@@ -377,8 +415,6 @@ public class UserAuthentication {
                 this.timer = Executors.newSingleThreadScheduledExecutor();
                 this.timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
 
-                // update the button content
-                this.captureButton.setText("Capture");
             } else {
                 // log the error
                 System.err.println("Impossible to open the camera connection...");
@@ -425,10 +461,31 @@ public class UserAuthentication {
                             isCardInserted = terminal.isCardPresent();
 
                             if (isCardInserted) {
+                                Tools.printLogMessage("ihm_au", "A card has been inserted...");
                                 card = terminal.connect("T=0");
 
                             } else {
+                                Tools.printLogMessage("ihm_au", "A card has been removed...");
+
+                                stopAcquisition();
+                                close();
+
+                                try {
+                                    if (sessionKey != null) {
+                                        Tools.printLogMessage("ihm_au", "Destroying the session...");
+                                        openSocket();
+                                        send("DELETE;SESSION;" + sessionKey);
+                                        receiveAndPrepare(1024);
+                                        close();
+                                        Tools.printLogMessage("ihm_au", "Succeeded!");
+                                    }
+
+                                } catch (Exception e) {}
+
                                 card = null;
+                                sessionKey = null;
+                                biometryData = null;
+                                remainingAttemps = 3;
                             }
                         }
 
@@ -462,22 +519,6 @@ public class UserAuthentication {
                                 tabPane.getSelectionModel().select(authTab);
                             }
                         });
-
-                        stopAcquisition();
-                        close();
-
-                        try {
-                            if (sessionKey != null) {
-                                openSocket();
-                                send("DELETE;SESSION;" + sessionKey);
-                                receive(1024);
-                                close();
-                            }
-
-                        } catch (Exception e) {}
-
-                        sessionKey = null;
-                        biometryData = null;
                     }
 
                     Thread.sleep(1000);
@@ -504,6 +545,7 @@ public class UserAuthentication {
     }
 
     private void send(String message) throws IOException {
+        Tools.printLogMessageErr("<-----", "Payload: " + message.replace(";", " "));
         byte[] buffer = message.getBytes(StandardCharsets.UTF_8);
         outputStream.write(buffer, 0, buffer.length);
         outputStream.flush();
@@ -521,7 +563,9 @@ public class UserAuthentication {
     }
 
     private String[] receiveAndPrepare(int bufferSize) throws Exception {
-        return receive(bufferSize).split(";");
+        String[] reply = receive(bufferSize).split(";");
+        Tools.printLogMessageErr("----->", "Payload: " + String.join(" ", reply));
+        return reply;
     }
 
     private void close() {

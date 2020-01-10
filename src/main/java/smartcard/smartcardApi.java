@@ -73,7 +73,6 @@ public class smartcardApi {
             System.out.println(text);
             int SW1 = r.getSW1();
             if (SW1 == 144) {
-                System.out.println("Auth Success");
                 return 0;
             } else if (SW1 == 99) throw new InvalidSecretCodeException("Error : Invalid secret code");
             else if (SW1 == 101) throw new UnknownModeException("Error : Requested mode is unknown");
@@ -184,7 +183,7 @@ public class smartcardApi {
         System.out.println(toString(readResult));
         String userData = new String(readResult);
         // To print the text from the retrieved bytes.
-        System.out.println(userData);
+        System.out.println("            Read data from User" +Integer.toString(userId) +" : " + userData);
         userData.replace(" ", "");
         return userData;
     }
@@ -210,10 +209,8 @@ public class smartcardApi {
             throw new InvalidP2ParameterException("Error : User id must be 1 or 2 in order to match with register adress");
 
         byte[] b = data.getBytes();
-        String s = new String(b);
-        System.out.println(s);
-
         int writeResult = update(channel, p2, 0x04, b);
+        System.out.println("            Updated for User" +userId +" with data : " +data);
         return writeResult;
     }
 
@@ -239,6 +236,7 @@ public class smartcardApi {
         byte[] b = new byte[64];
 
         int writeResult = update(channel, p2, 0x04, b);
+        System.out.println("            Reseted data for User" +userId);
         return writeResult;
     }
 
@@ -255,7 +253,9 @@ public class smartcardApi {
      */
     public static int applyUserMode(CardChannel channel) throws InvalidLcValueException, UnknownException, InvalidP2ParameterException, MemoryErrorException, SecurityNotSatisfiedException, InvalidInstructionByteException {
         byte[] issuerToUserCommand = {(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x80};
-        return update(channel, 0x04, 0x04, issuerToUserCommand);
+        int resultCode = update(channel, 0x04, 0x04, issuerToUserCommand);
+        System.out.println("            Applied userMode to current card");
+        return resultCode;
     }
 
     /***
@@ -267,13 +267,12 @@ public class smartcardApi {
      * @throws CardException
      */
     public static CardChannel resetSmartcardConnexion(CardChannel channel, CardTerminal terminal, Card card) throws CardException {
-        System.out.println("ResetSmartCardConnexion :");
-        System.out.println("    closing current channel");
-        System.out.println("    disconnecting the card with a connection reset");
+        System.out.println("      ResetSmartCardConnexion : entering procedure");
+        System.out.println("            disconnecting the card with a connection reset");
         card.disconnect(true);
-        System.out.println("    connecting with card on T=0");
+        System.out.println("            connecting with card on T=0");
         card = terminal.connect("T=0");
-        System.out.println("    returning card channel");
+        System.out.println("            returning card channel");
         return card.getBasicChannel();
     }
 
@@ -310,8 +309,10 @@ public class smartcardApi {
         System.out.println("      Writing user info1, info2 in User1, User2");
         if (info1.length() < 64 && info2.length() < 64) {
             try {
+                resetUserData(channel,1);
                 updateUserData(channel, 1, info1);
                 System.out.println("      Writing info1 success");
+                resetUserData(channel,2);
                 updateUserData(channel, 2, info2);
                 System.out.println("      Writing info2 success");
             } catch (InvalidLcValueException | UnknownException | InvalidP2ParameterException | MemoryErrorException | SecurityNotSatisfiedException | InvalidInstructionByteException e) {
@@ -359,6 +360,76 @@ public class smartcardApi {
         return 0;
     }
 
+    public static int createUserCardFull(CardChannel channel, String info1, String info2, int userPassword, CardTerminal terminal, Card card) {
+        System.out.println("Create user card from blank smartcard");
+
+        System.out.println("      Authenticating as default CSC0 user");
+        try {
+            authCSCDefault(channel, 0);
+            System.out.println("      Authentication success");
+        } catch (InvalidSecretCodeException | UnknownModeException | InvalidLcValueException | MaxPresentationExceededException | InvalidP2ParameterException | InvalidInstructionByteException | UnknownException e) {
+            System.out.println("      Error : Authentication as CSC0 failed");
+            if (e.getClass() == InvalidSecretCodeException.class) {
+                System.out.println("        Wrong password provided. Current card is not factory");
+            }
+            e.getMessage();
+            return -10;
+        }
+
+        System.out.println("      Writing user info1, info2 in User1, User2");
+        if (info1.length() < 64 && info2.length() < 64) {
+            try {
+                resetUserData(channel,1);
+                updateUserData(channel, 1, info1);
+                System.out.println("      Writing info1 success");
+                resetUserData(channel,2);
+                updateUserData(channel, 2, info2);
+                System.out.println("      Writing info2 success");
+            } catch (InvalidLcValueException | UnknownException | InvalidP2ParameterException | MemoryErrorException | SecurityNotSatisfiedException | InvalidInstructionByteException e) {
+                System.out.println("      Error : failed to write user info");
+                e.printStackTrace();
+                return -11;
+            }
+        } else {
+            System.out.println("      Error : given info are too long");
+            return -12;
+        }
+
+        System.out.println("      Updating user1, user2 password");
+        try {
+            writeCSC(channel, 1, userPassword);
+            System.out.println("      Updating user1 password success");
+            writeCSC(channel, 2, userPassword);
+            System.out.println("      Updating user2 password success");
+        } catch (InvalidNumberOfDigitsException | InvalidCSCIdException | InvalidLcValueException | InvalidP2ParameterException | InvalidInstructionByteException | MemoryErrorException | SecurityNotSatisfiedException | UnknownException e) {
+            System.out.println("      Error : failed to update user password");
+            e.printStackTrace();
+            return -13;
+        }
+
+        System.out.println("      Applying user mode");
+        try {
+            applyUserMode(channel);
+            System.out.println("      Applying user mode success");
+        } catch (InvalidLcValueException | UnknownException | InvalidP2ParameterException | MemoryErrorException | SecurityNotSatisfiedException | InvalidInstructionByteException e) {
+            System.out.println("      Error : failed to apply user mode");
+            e.printStackTrace();
+            return -14;
+        }
+
+        System.out.println("      Reseting card");
+        try {
+            resetSmartcardConnexion(channel, terminal, card);
+            System.out.println("      Reseting card success");
+        } catch (CardException e) {
+            System.out.println("      Error : failed to reset card");
+            e.printStackTrace();
+            return -15;
+        }
+        System.out.println("      Successfully went through user card creation sequence");
+        return 0;
+    }
+
     /***
      *
      * @param channel
@@ -377,11 +448,8 @@ public class smartcardApi {
         ResponseAPDU r;
         try {
             r = channel.transmit(command);
-            String text = toString(r.getData());
-            System.out.println(text);
             int SW1 = r.getSW1();
             if (SW1 == 144) {
-                System.out.println("Read successfully executed");
                 return r.getData();
             } else if (SW1 == 101) throw new UnknownModeException("Error : Encoutered a memory error");
             else if (SW1 == 103)
@@ -417,11 +485,8 @@ public class smartcardApi {
         ResponseAPDU r;
         try {
             r = channel.transmit(command);
-            String text = toString(r.getData());
-            System.out.println(text);
             int SW1 = r.getSW1();
             if (SW1 == 144) {
-                System.out.println("Update successfully executed");
                 return 0;
             } else if (SW1 == 101) throw new MemoryErrorException("Error : Encoutered a memory error");
             else if (SW1 == 103) throw new InvalidLcValueException("Error : Invalid Lc value");
@@ -455,13 +520,9 @@ public class smartcardApi {
         ResponseAPDU r;
         try {
             r = channel.transmit(command);
-            String text = toString(r.getData());
-            System.out.println(text);
             int SW1 = r.getSW1();
-            if (SW1 == 144) {
-                System.out.println("Auth Success");
-                return 0;
-            } else if (SW1 == 99) throw new InvalidSecretCodeException("Error : Invalid secret code");
+            if (SW1 == 144) return 0;
+            else if (SW1 == 99) throw new InvalidSecretCodeException("Error : Invalid secret code");
             else if (SW1 == 101) throw new UnknownModeException("Error : Requested mode is unknown");
             else if (SW1 == 103) throw new InvalidLcValueException("Error : Invalid Lc value");
             else if (SW1 == 105)
