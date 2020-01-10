@@ -467,9 +467,9 @@ public class smartcardApi {
             r = channel.transmit(command);
             int SW1 = r.getSW1();
             if (SW1 == 144) {
-                System.out.println("                  Successfully read data bytes at 0x" + Integer.toHexString(p2) + " with lenght 0x" + Integer.toHexString(le) + " (" +le +" :");                System.out.println("                  " + toString(r.getData()));
-                System.out.println("                  String value of retrieved bytes is :");
-                System.out.println("                  " + new String(r.getData()));
+                System.out.println("                  Successfully read data bytes at 0x" + Integer.toHexString(p2) + " with lenght 0x" + Integer.toHexString(le) + " (" +le +" :");
+                System.out.println("                  " + toString(r.getData()));
+                System.out.println("                  String value of retrieved bytes is :" + new String(r.getData())+"\n");
                 return r.getData();
             } else if (SW1 == 101) throw new UnknownModeException("Error : Encoutered a memory error");
             else if (SW1 == 103)
@@ -542,10 +542,23 @@ public class smartcardApi {
         CommandAPDU command = new CommandAPDU(0x00, 0x20, 0x00, p2, data);
         ResponseAPDU r;
         try {
+            int id;
+            if (p2 == 0x07) id = 0;
+            else if (p2 == 0x39) id = 1;
+            else id = 2;
             r = channel.transmit(command);
             int SW1 = r.getSW1();
-            if (SW1 == 144) return 0;
-            else if (SW1 == 99) throw new InvalidSecretCodeException("Error : Invalid secret code");
+            if (SW1 == 144) {
+                System.out.println("                  Successfully verified CSC" +id +" at address 0x"+Integer.toHexString(p2));
+                System.out.println("                  From password : " + new String(data));
+                System.out.println("                  With bytes  : " + toString(data) +"\n");
+                return 0;
+            } else if (SW1 == 99){
+                System.out.println("                  Invalid authentification attempt for CSC" +id +" at address 0x"+Integer.toHexString(p2));
+                System.out.println("                  From password : " + new String(data));
+                System.out.println("                  With bytes  : " + toString(data) +"\n");
+                throw new InvalidSecretCodeException("Error : Invalid secret code");
+            }
             else if (SW1 == 101) throw new UnknownModeException("Error : Requested mode is unknown");
             else if (SW1 == 103) throw new InvalidLcValueException("Error : Invalid Lc value");
             else if (SW1 == 105)
