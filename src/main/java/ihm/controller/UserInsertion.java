@@ -41,6 +41,7 @@ public class UserInsertion {
     private BufferedOutputStream outputStream;
     private String sessionKey = null;
     private boolean isCardInserted = false;
+    private int remainingAttemps = 3;
     private CardTerminal terminal;
     private Card card;
 
@@ -234,11 +235,11 @@ public class UserInsertion {
         String enteredPinCode = authPinField.getText();
 
         CardChannel channel = card.getBasicChannel();
-        int remainingAttemps = 3;
 
         if (remainingAttemps > 0) {
             try {
                 smartcardApi.authCSC(channel, 1, Integer.valueOf(enteredPinCode));
+                remainingAttemps = 3;
 
             } catch (smartcardApi.InvalidSecretCodeException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -333,7 +334,7 @@ public class UserInsertion {
             }
 
             send("AUTHENTICATION;3;CREATE_SESSION");
-            reply = receive(1024).split(";");
+            reply = receiveAndPrepare(1024);
 
             if (reply.length != 3) {
                 throw new Exception("The reply is incorrect.");
@@ -349,7 +350,7 @@ public class UserInsertion {
             openSocket();
 
             send("GET;IS_ADMIN;" + sessionKey);
-            reply = receive(1024).split(";");
+            reply = receiveAndPrepare(1024);
 
             if (reply.length != 3) {
                 throw new Exception("The reply is incorrect.");
@@ -417,11 +418,15 @@ public class UserInsertion {
                             isCardInserted = terminal.isCardPresent();
 
                             if (isCardInserted) {
+                                Tools.printLogMessage("ihm_au", "A card has been inserted...");
                                 card = terminal.connect("T=0");
 
                             } else {
+                                Tools.printLogMessage("ihm_au", "A card has been removed...");
                                 card = null;
                             }
+
+                            remainingAttemps = 3;
                         }
 
                     } catch (CardException e) {
@@ -484,6 +489,7 @@ public class UserInsertion {
     }
 
     private void send(String message) throws IOException {
+        Tools.printLogMessageErr("<-----", "Payload: " + message.replace(";", " "));
         byte[] buffer = message.getBytes(StandardCharsets.UTF_8);
         outputStream.write(buffer, 0, buffer.length);
         outputStream.flush();
@@ -501,7 +507,9 @@ public class UserInsertion {
     }
 
     private String[] receiveAndPrepare(int bufferSize) throws Exception {
-        return receive(bufferSize).split(";");
+        String[] reply = receive(bufferSize).split(";");
+        Tools.printLogMessageErr("----->", "Payload: " + String.join(" ", reply));
+        return reply;
     }
 
     private void close() {
