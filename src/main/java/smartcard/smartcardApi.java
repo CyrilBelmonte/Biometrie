@@ -344,7 +344,7 @@ public class smartcardApi {
             return -13;
         }
 
-        System.out.println("      Overwriting CSC0 password from factory to company secured");
+        /*System.out.println("      Overwriting CSC0 password from factory to company secured");
         try{
             writeCSC(channel, 0, 123456);
             System.out.println("      Overwriting CSC0 password success");
@@ -354,7 +354,7 @@ public class smartcardApi {
             return -16;
         }
 
-        /*System.out.println("      Applying user mode");
+        System.out.println("      Applying user mode");
         try {
             applyUserMode(channel);
             System.out.println("      Applying user mode success");

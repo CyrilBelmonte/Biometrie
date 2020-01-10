@@ -1,5 +1,6 @@
 package ihm.controller;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -9,6 +10,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import ihm.utils.Hough;
+import ihm.utils.filter.Canny;
+import ihm.utils.filter.Laplacien;
+import ihm.utils.filter.Prewitt;
+import ihm.utils.filter.Sobel;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,6 +27,7 @@ import server.tools.AES;
 import server.tools.Tools;
 import smartcard.smartcardApi;
 
+import javax.imageio.ImageIO;
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -35,6 +42,7 @@ public class UserInsertion {
     private static final int REMOTE_PORT = 4000;
     private static final String KEYSTORE_LOCATION = "C:/client_keystore.jks";
     private static final String KEYSTORE_PASSWORD = "password";
+    private static int LIMIT = 90;
 
     private SSLSocket socket;
     private BufferedInputStream inputStream;
@@ -160,9 +168,39 @@ public class UserInsertion {
         int x = Tools.getSeed();
         int y = Tools.getSeed();
 
+
+        String fileIn = biometryPath;
+        String fileOut = "src\\resources\\tmp\\";
+
+        try {
+            BufferedImage img = ImageIO.read(new File(fileIn));
+            ImageIO.write(img, "png", new File(fileOut + "pictures.png"));
+
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Photo");
+            alert.setHeaderText(null);
+            alert.setContentText("Unable to read the user photo.");
+            alert.showAndWait();
+            return;
+        }
+
+        Canny canny = new Canny(LIMIT);
+        canny.filterImg(fileIn, fileOut);
+
+        Sobel sobel = new Sobel(LIMIT);
+        sobel.filterImg(fileIn, fileOut);
+
+        Laplacien laplacien = new Laplacien(LIMIT);
+        laplacien.filterImg(fileIn, fileOut);
+
+        Prewitt prewitt = new Prewitt(LIMIT);
+        prewitt.filterImg(fileIn, fileOut);
+        String biometryHistogram = Hough.calculateHistogram();
+
         String userPinHash = Tools.hmacMD5(Tools.hmacMD5(userPinCode, String.valueOf(x)), String.valueOf(y));
         String biometryAESKey = AES.generateKey(128);
-        String biometryData = AES.encrypt(biometryPath, biometryAESKey);
+        String biometryData = AES.encrypt(biometryHistogram, biometryAESKey);
 
         // Opening the socket
         try {

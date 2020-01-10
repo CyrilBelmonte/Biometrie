@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import ihm.utils.Hough;
 import ihm.utils.Utils;
 import ihm.utils.filter.Canny;
 import ihm.utils.filter.Laplacien;
@@ -131,10 +132,8 @@ public class UserAuthentication {
         Canny canny = new Canny(LIMIT);
         canny.filterImg(fileIn, fileOut);
 
-
         Sobel sobel = new Sobel(LIMIT);
         sobel.filterImg(fileIn, fileOut);
-
 
         Laplacien laplacien = new Laplacien(LIMIT);
         laplacien.filterImg(fileIn, fileOut);
@@ -144,6 +143,8 @@ public class UserAuthentication {
 
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/fxml/DiffTest.fxml"));
+
+        String histogram = Hough.calculateHistogram();
 
         Parent parent = null;
 
