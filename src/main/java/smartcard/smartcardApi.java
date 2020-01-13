@@ -276,6 +276,12 @@ public class smartcardApi {
         return card.getBasicChannel();
     }
 
+    public static int secureAccessConditionArea(CardChannel channel) throws InvalidLcValueException, UnknownException, InvalidP2ParameterException, MemoryErrorException, SecurityNotSatisfiedException, InvalidInstructionByteException {
+        System.out.println("            Writing 0x00 0x00 0x00 0xEE at 0x05");
+        byte[] data = {(byte)0x00, (byte)0x00, (byte)0x00, (byte)0xEE};
+        return update(channel, 0x05, 0x04, data);
+    }
+
     /***
      *
      * Returns -10 if failed to authenticate.
@@ -457,6 +463,13 @@ public class smartcardApi {
             System.out.println("      Error : failed to update user password");
             e.printStackTrace();
             return -13;
+        }
+
+        System.out.println("      Securing access condition area");
+        try{
+            secureAccessConditionArea(channel);
+        } catch (SecurityNotSatisfiedException | UnknownException | MemoryErrorException | InvalidInstructionByteException | InvalidP2ParameterException | InvalidLcValueException e) {
+            e.printStackTrace();
         }
 
         System.out.println("      Applying user mode");

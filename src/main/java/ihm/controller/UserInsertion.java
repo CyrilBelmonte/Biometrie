@@ -199,8 +199,14 @@ public class UserInsertion {
         String biometryHistogram = Hough.calculateHistogram();
 
         String userPinHash = Tools.hmacMD5(Tools.hmacMD5(userPinCode, String.valueOf(x)), String.valueOf(y));
+
         String biometryAESKey = AES.generateKey(128);
         String biometryData = AES.encrypt(biometryHistogram, biometryAESKey);
+
+        do {
+            biometryAESKey = AES.generateKey(128);
+            biometryData = AES.encrypt(biometryHistogram, biometryAESKey);
+        } while (AES.decrypt(biometryData, biometryAESKey) == null);
 
         // Opening the socket
         try {
@@ -239,7 +245,7 @@ public class UserInsertion {
 
             // Flashing the card
             CardChannel channel = card.getBasicChannel();
-            smartcardApi.createUserCard(channel, userID + ";" + firstName + " " + lastName, biometryAESKey, Integer.valueOf(userPinCode), terminal, card);
+            smartcardApi.createUserCardFull(channel, userID + ";" + firstName + " " + lastName, biometryAESKey, Integer.valueOf(userPinCode), terminal, card);
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Operation successful");

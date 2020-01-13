@@ -129,22 +129,28 @@ public class UserAuthentication {
         String fileOut = "src\\resources\\tmp\\";
 
 
+        Tools.printLogMessage("ihm_au", "Calculating Canny...");
         Canny canny = new Canny(LIMIT);
         canny.filterImg(fileIn, fileOut);
 
+        Tools.printLogMessage("ihm_au", "Calculating Sobel...");
         Sobel sobel = new Sobel(LIMIT);
         sobel.filterImg(fileIn, fileOut);
 
+        Tools.printLogMessage("ihm_au", "Calculating Laplacien...");
         Laplacien laplacien = new Laplacien(LIMIT);
         laplacien.filterImg(fileIn, fileOut);
 
+        Tools.printLogMessage("ihm_au", "Calculating Prewitt...");
         Prewitt prewitt = new Prewitt(LIMIT);
         prewitt.filterImg(fileIn, fileOut);
 
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/fxml/DiffTest.fxml"));
 
+        Tools.printLogMessage("ihm_au", "Calculating Hough and histogram...");
         String histogram = Hough.calculateHistogram();
+        Tools.printLogMessage("ihm_au", "Calculated histogram:" + histogram);
 
         Parent parent = null;
 

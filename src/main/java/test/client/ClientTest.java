@@ -27,7 +27,7 @@ public class ClientTest {
 
         // Authentication
         openSocket();
-        send("AUTHENTICATION;1;100002");
+        send("AUTHENTICATION;1;100028");
         reply = receiveAndPrepare(1024);
         String[] codes = reply[2].split(",");
         send("AUTHENTICATION;2;" + Tools.hmacMD5(Tools.hmacMD5(Tools.hmacMD5("123456", codes[0]), codes[1]), codes[2]));
@@ -36,14 +36,6 @@ public class ClientTest {
         reply = receiveAndPrepare(1024);
         sessionKey = reply[2];
         System.out.println("Session key: " + sessionKey);
-        close();
-
-        // GET
-        openSocket();
-        //sessionKey = "dcdd9808-7e87-4f3e-ac1d-4abb92157f8e";
-        send("GET;IS_ADMIN;" + sessionKey);
-        reply = receiveAndPrepare(1024);
-        System.out.println("Is admin ? " + reply[2]);
         close();
 
         // CREATE
